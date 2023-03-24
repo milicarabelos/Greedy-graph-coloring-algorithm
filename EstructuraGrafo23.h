@@ -24,5 +24,14 @@ struct _s_vertice {
     unsigned int  grado;
     unsigned int *indice_vecinos;
 };
+/*
+Crea un nuevo grafo con la cantidad de vertices
+y la cantidad de lados
+*/
+Grafo init_grafo(unsigned int n, unsigned int m);
+/*
+Crea un nuevo vertice con el nombre
+*/
+vertice init_vertice(unsigned int nombre);
 
 #endif
