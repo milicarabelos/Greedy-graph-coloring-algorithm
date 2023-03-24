@@ -1,13 +1,32 @@
 #include "APIG23.h"
 
 #include <stdint.h>
+#include <string.h>
 
+#include "EstructuraGrafo23.h"
 // construcci'on/destrucci'on
 
 /*debe leer desde stdin
 Debo calcular el Delta
 */
-Grafo ConstruirGrafo();
+Grafo ConstruirGrafo(FILE *f_input) {
+    char         line[256];
+    unsigned int n, m;
+
+    while (fgets(line, sizeof(line), f_input)) {
+        if (line[0] == 'c') {
+            // hago skip a esta linea y continuo a la siguiente
+            continue;
+        } else if (line[0] == 'p') {
+            sscanf(line, "p edge %d %d", &n, &m);
+            printf("n = %d, m = %d\n", n, m);
+            Grafo init_grafo(n, m);
+        } else if (line[0] == 'e') {
+            // la linea es de lado
+            // VER IMPLEMENTACION
+        }
+    }
+}
 
 void DestruirGrafo(Grafo G);
 
