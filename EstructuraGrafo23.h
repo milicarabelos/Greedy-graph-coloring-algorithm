@@ -33,5 +33,6 @@ Grafo init_grafo(unsigned int n, unsigned int m);
 Crea un nuevo vertice con el nombre
 */
 vertice init_vertice(unsigned int nombre);
-
+// revisar
+void cargar_lado(Tupla *lista_lados, int i, unsigned int primero, unsigned int segundo);
 #endif
