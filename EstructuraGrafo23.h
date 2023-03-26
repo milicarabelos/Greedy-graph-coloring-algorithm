@@ -9,21 +9,19 @@ typedef struct
     unsigned int y;
 } Tupla;
 
-struct GrafoSt
-{
-    vertice *list_vertices; // ordenar por indice
-    Tupla *list_lados;      // ordenar para cargar vertices
+struct GrafoSt {
+    vertice     *list_vertices;  // ordenar por indice
+    Tupla       *list_lados;     // ordenar para cargar vertices
     unsigned int cant_vertices;
     unsigned int cant_lados;
-    unsigned int mayor_grado; // Δ
-    unsigned int menor_grado; // δ
+    unsigned int mayor_grado;  // Δ
+    unsigned int menor_grado;  // δ
 };
 
-struct _s_vertice
-{
+struct _s_vertice {
     unsigned int nombre;
     // capaz indice creo que no vale la pena agregar ese campo
-    unsigned int grado;
+    unsigned int  grado;
     unsigned int *indice_vecinos;
 };
 
@@ -38,6 +36,8 @@ Crea un nuevo vertice con el nombre
 vertice init_vertice(unsigned int nombre);
 // revisar
 void cargar_lado(Tupla *lista_lados, int i, unsigned int primero, unsigned int segundo);
+
+int cmp_tuples(const void *a, const void *b);
 
 Grafo destroy_grafo(Grafo grafo);
 
