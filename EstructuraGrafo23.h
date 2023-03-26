@@ -1,6 +1,8 @@
 #ifndef EstructuraGrafo23_H
 #define EstructuraGrafo23_H
 
+#include "APIG23.h"
+
 typedef struct _s_vertice *vertice;
 
 typedef struct
@@ -29,16 +31,16 @@ struct _s_vertice {
 Crea un nuevo grafo con la cantidad de vertices
 y la cantidad de lados
 */
-Grafo init_grafo(unsigned int n, unsigned int m);
+// Grafo init_grafo(unsigned int n, unsigned int m);
 /*
 Crea un nuevo vertice con el nombre
 */
-vertice init_vertice(unsigned int nombre);
-// revisar
-void cargar_lado(Tupla *lista_lados, int i, unsigned int primero, unsigned int segundo);
+// vertice init_vertice(unsigned int nombre);
+//  revisar
+// void cargar_lado(Tupla *lista_lados, int i, unsigned int primero, unsigned int segundo);
 
-int cmp_tuples(const void *a, const void *b);
+// int cmp_tuples(const void *a, const void *b);
 
-Grafo destroy_grafo(Grafo grafo);
+// Grafo destroy_grafo(Grafo grafo);
 
 #endif

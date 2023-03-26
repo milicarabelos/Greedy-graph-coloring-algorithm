@@ -1,5 +1,4 @@
-#ifndef APIG23_H
-#define APIG23_H
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,6 +7,8 @@
 #include "EstructuraGrafo23.h"
 
 // Grafo es un puntero a una estructura GrafoSt, la cual debe estar definida en el .h de arriba
+#ifndef APIG23_H
+#define APIG23_H
 
 typedef struct GrafoSt *Grafo;
 

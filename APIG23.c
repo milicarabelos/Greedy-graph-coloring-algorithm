@@ -8,8 +8,80 @@
 
 #include "EstructuraGrafo23.h"
 
-// construcci'on/destrucci'on
+//////////////////////////////////////////////////////////////////////////////////////////
+///////////////FUNCIONES ESTATICAS PARA MEJORAR LA MODULARIZACION DEL CODIGO//////////////
 
+/*Crea un nuevo grafo con la cantidad de vertices
+y la cantidad de lados
+*/
+static Grafo init_grafo(unsigned int n, unsigned int m) {
+
+    printf("entre a init");
+
+    Grafo new_grafo = calloc(1, sizeof(struct GrafoSt));
+    printf("antes de los lados");
+    new_grafo->list_lados = (Tupla *)calloc(m, sizeof(unsigned int));
+    printf("desp de los lados");
+    new_grafo->list_vertices = (vertice *)calloc(n, sizeof(vertice));
+    new_grafo->cant_vertices = n;
+    new_grafo->cant_lados    = m;
+    new_grafo->mayor_grado   = 0;
+    new_grafo->menor_grado   = 0;
+
+    return new_grafo;
+}
+
+static vertice init_vertice(unsigned int nombre) {
+    vertice new_vertice         = calloc(1, sizeof(struct _s_vertice));
+    new_vertice->nombre         = nombre;
+    new_vertice->grado          = 0;
+    new_vertice->indice_vecinos = (unsigned int *)calloc(1, sizeof(vertice));
+    // VER ACA COMO PEDIR BIEN LA MEMORIA DE LOS VECINOS PODEMOS PONER NULL ACA Y DESPUES CADA QUE
+    // AGREGEMOS UN VECINO VAMOS HACIENDO REALLOC ME PARECE BUENA IDEA TOTAL DIFERENCIAMOS LOS CASOS
+    //  CUANDO EL GRADO ES 1 QUE USAMOS CALLOC ELSE REALOCC
+    return new_vertice;
+}
+// revisar
+static void cargar_lado(Tupla *lista_lados, int i, unsigned int primero, unsigned int segundo) {
+    lista_lados[i].x = primero;
+    lista_lados[i].y = segundo;
+}
+
+static int cmp_tuples(const void *a, const void *b) {
+    Tupla *tupla_a = (Tupla *)a;
+    Tupla *tupla_b = (Tupla *)b;
+
+    if (tupla_a->x < tupla_b->x) {
+        return -1;
+    } else if (tupla_a->x > tupla_b->x) {
+        return 1;
+    } else {
+        if (tupla_a->y < tupla_b->y) {
+            return -1;
+        } else if (tupla_a->y > tupla_b->y) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+}
+
+static Grafo destroy_grafo(Grafo grafo) {
+    for (unsigned int i = 0; i < grafo->cant_lados; i++) {
+        free(grafo->list_vertices[i]->indice_vecinos);
+        grafo->list_vertices[i]->indice_vecinos = NULL;
+    }
+
+    free(grafo->list_vertices);
+    grafo->list_vertices = NULL;
+    free(grafo->list_lados);
+    grafo->list_lados = NULL;
+
+    return NULL;
+}
+////////////////////////////////////////////////////////////////////////////////////////
+
+// construcci'on/destrucci'on
 /*debe leer desde stdin
 Debo calcular el Delta
 */
@@ -51,6 +123,12 @@ Grafo ConstruirGrafo(FILE *f_input) {
 
     // ordeno los lados de menor a mayor por primera y segunda componente
     qsort(my_grafo->list_lados, my_grafo->cant_lados, sizeof(Tupla), cmp_tuples);
+
+    for (unsigned int i = 0; i < my_grafo->cant_lados; i++) {
+        printf("%u lado = (%u,%u)\n", i, my_grafo->list_lados[i].x, my_grafo->list_lados[i].y);
+    }
+
+    return my_grafo;
 }
 
 void DestruirGrafo(Grafo G) {
@@ -79,7 +157,7 @@ unsigned int Grado(unsigned int i, Grafo G) {
 
 unsigned int IndiceVecino(unsigned int j, unsigned int i, Grafo G) {
     if (i >= G->cant_vertices || j >= G->list_vertices[i]->grado) {
-        return 2 ^ 32 - 1;
+        return (2 ^ 32) - 1;
         // caso de error
     }
 
