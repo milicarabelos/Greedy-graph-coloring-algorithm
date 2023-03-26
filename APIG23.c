@@ -19,10 +19,24 @@ static Grafo init_grafo(unsigned int n, unsigned int m) {
     printf("entre a init");
 
     Grafo new_grafo = calloc(1, sizeof(struct GrafoSt));
+
+    if (new_grafo == NULL) {
+        printf("Error no se pudo pedir la memoria para la estructura grafo");
+        return NULL;
+    }
+
     printf("antes de los lados");
     new_grafo->list_lados = (Tupla *)calloc(m, sizeof(unsigned int));
+    if (new_grafo->list_lados == NULL) {
+        printf("Error no se pudo pedir la memoria para la lista de lados");
+        return NULL;
+    }
     printf("desp de los lados");
     new_grafo->list_vertices = (vertice *)calloc(n, sizeof(vertice));
+    if (new_grafo->list_vertices == NULL) {
+        printf("Error no se pudo pedir la memoria para la lista de vertices");
+        return NULL;
+    }
     new_grafo->cant_vertices = n;
     new_grafo->cant_lados    = m;
     new_grafo->mayor_grado   = 0;
@@ -32,7 +46,11 @@ static Grafo init_grafo(unsigned int n, unsigned int m) {
 }
 
 static vertice init_vertice(unsigned int nombre) {
-    vertice new_vertice         = calloc(1, sizeof(struct _s_vertice));
+    vertice new_vertice = calloc(1, sizeof(struct _s_vertice));
+    if (new_vertice == NULL) {
+        printf("Error pidiendo memoria para el vertice");
+        return NULL;
+    }
     new_vertice->nombre         = nombre;
     new_vertice->grado          = 0;
     new_vertice->indice_vecinos = (unsigned int *)calloc(1, sizeof(vertice));
