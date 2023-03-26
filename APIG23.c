@@ -77,4 +77,11 @@ unsigned int Grado(unsigned int i, Grafo G) {
     return G->list_vertices[i]->grado;
 }
 
-unsigned int IndiceVecino(unsigned int j, unsigned int i, Grafo G);
+unsigned int IndiceVecino(unsigned int j, unsigned int i, Grafo G) {
+    if (i >= G->cant_vertices || j >= G->list_vertices[i]->grado) {
+        return 2 ^ 32 - 1;
+        // caso de error
+    }
+
+    return G->list_vertices[i]->indice_vecinos[j];
+}
