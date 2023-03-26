@@ -16,12 +16,8 @@ y la cantidad de lados
 */
 static Grafo init_grafo(unsigned int n, unsigned int m) {
 
-    printf("entre a init");
-
-    Grafo new_grafo = calloc(1, sizeof(struct GrafoSt));
-    printf("antes de los lados");
-    new_grafo->list_lados = (Tupla *)calloc(m, sizeof(unsigned int));
-    printf("desp de los lados");
+    Grafo new_grafo          = calloc(1, sizeof(struct GrafoSt));
+    new_grafo->list_lados    = (Tupla *)calloc(m, sizeof(unsigned int));
     new_grafo->list_vertices = (vertice *)calloc(n, sizeof(vertice));
     new_grafo->cant_vertices = n;
     new_grafo->cant_lados    = m;
@@ -50,6 +46,7 @@ static void cargar_lado(Tupla *lista_lados, int i, unsigned int primero, unsigne
 static int cmp_tuples(const void *a, const void *b) {
     Tupla *tupla_a = (Tupla *)a;
     Tupla *tupla_b = (Tupla *)b;
+    printf("DALEEEEE\n");
 
     if (tupla_a->x < tupla_b->x) {
         return -1;
@@ -86,7 +83,7 @@ static Grafo destroy_grafo(Grafo grafo) {
 Debo calcular el Delta
 */
 Grafo ConstruirGrafo(FILE *f_input) {
-    char         line[256];
+    char         line[1024];
     unsigned int n, m, x, y;
     Grafo        my_grafo;
 
@@ -122,10 +119,39 @@ Grafo ConstruirGrafo(FILE *f_input) {
     }
 
     // ordeno los lados de menor a mayor por primera y segunda componente
+    // ERROR: aca funciona para R22_93_15 pero tira malloc corrupted para el resto SE CLAVA ACAAAA
     qsort(my_grafo->list_lados, my_grafo->cant_lados, sizeof(Tupla), cmp_tuples);
 
     for (unsigned int i = 0; i < my_grafo->cant_lados; i++) {
-        printf("%u lado = (%u,%u)\n", i, my_grafo->list_lados[i].x, my_grafo->list_lados[i].y);
+        printf("%u lado = (%u,%u)\n", i + 1, my_grafo->list_lados[i].x, my_grafo->list_lados[i].y);
+    }
+
+    unsigned int x_fijado, y_fijado;
+
+    struct _s_vertice vertice_iterativo;
+    // cargo los vertices
+    for (int i = 0; i < m; i++) {
+        // vertice_iterativo.nombre   = my_grafo->list_lados[i].x;
+        // vertice_iterativo.grado = my_grafo->list_lados[i].y;
+        //  VER como agregar vertice_iterativo.indice_vecinos el nuevo vecino
+
+        x_fijado                   = my_grafo->list_lados[i].x;
+        my_grafo->list_vertices[i] = x_fijado;
+        while (my_grafo->list_lados[i].x == x_fijado) {
+            y_fijado                       = my_grafo->list_lados[i].y;
+            my_grafo->list_vertices[i + 1] = y_fijado;
+            i++;
+        }
+    }
+    ////////////////////////////////////////////////////////////////////////
+    // Aca imprimo los vertices para ver que onda y despues tiro un error si se ordeno mal
+    for (int i = 0; i < n; i++) {
+        printf("vertice %d : %u\n", i, my_grafo->list_vertices[i]);
+    }
+    for (int i = 0; i < n; i++) {
+        if (i > 0 && my_grafo->list_vertices[i] <= my_grafo->list_vertices[i - 1]) {
+            printf("ERROR MAXIMO LPM NO SAFAMOS\n");
+        }
     }
 
     return my_grafo;
