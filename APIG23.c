@@ -80,20 +80,11 @@ unsigned int Delta(Grafo G)
 
 unsigned int Nombre(unsigned int i, Grafo G)
 {
+    return G->list_vertices[i]->nombre;
 }
-unsigned int Grado(unsigned int i, Grafo G);
-unsigned int IndiceVecino(unsigned int j, unsigned int i, Grafo G);
-
-unsigned int NumeroDeLados(Grafo G)
+unsigned int Grado(unsigned int i, Grafo G)
 {
-    return G->cant_lados;
+    return G->list_vertices[i]->grado;
 }
-unsigned int Delta(Grafo G)
-{
-    return G->mayor_grado;
-}
-// funciones de extraccion de informacion de vertices
 
-unsigned int Nombre(unsigned int i, Grafo G);
-unsigned int Grado(unsigned int i, Grafo G);
 unsigned int IndiceVecino(unsigned int j, unsigned int i, Grafo G);
