@@ -26,13 +26,16 @@ static Grafo init_grafo(unsigned int n, unsigned int m) {
     }
 
     printf("antes de los lados");
-    new_grafo->list_lados = (Tupla *)calloc(m, sizeof(unsigned int));
+    // guardaste memoria para M tuplas
+    new_grafo->list_lados = (Tupla *)calloc(m, sizeof(Tupla));
     if (new_grafo->list_lados == NULL) {
         printf("Error no se pudo pedir la memoria para la lista de lados");
         return NULL;
     }
     printf("desp de los lados");
-    new_grafo->list_vertices = (vertice *)calloc(n, sizeof(vertice));
+    // guaradste memoria para una lista con N vertices
+    // estos vertices fijate van a vivr en esos espacios de memoria
+    new_grafo->list_vertices = calloc(n, sizeof(vertice));
     if (new_grafo->list_vertices == NULL) {
         printf("Error no se pudo pedir la memoria para la lista de vertices");
         return NULL;
@@ -45,7 +48,7 @@ static Grafo init_grafo(unsigned int n, unsigned int m) {
     return new_grafo;
 }
 
-static vertice init_vertice(unsigned int nombre) {
+/* static vertice init_vertice(unsigned int nombre) {
     vertice new_vertice = calloc(1, sizeof(struct _s_vertice));
     if (new_vertice == NULL) {
         printf("Error pidiendo memoria para el vertice");
@@ -53,22 +56,51 @@ static vertice init_vertice(unsigned int nombre) {
     }
     new_vertice->nombre         = nombre;
     new_vertice->grado          = 0;
-    new_vertice->indice_vecinos = (unsigned int *)calloc(1, sizeof(vertice));
-    // VER ACA COMO PEDIR BIEN LA MEMORIA DE LOS VECINOS PODEMOS PONER NULL ACA Y DESPUES CADA QUE
+    new_vertice->indice_vecinos = calloc(1, sizeof(unsigned int));
+    // VER ACA COMO PEDIR BIEN LA MEMORIA DE LOS VECINOS PODEMOS PONER NULL Y DESPUES CADA QUE
     // AGREGEMOS UN VECINO VAMOS HACIENDO REALLOC ME PARECE BUENA IDEA TOTAL DIFERENCIAMOS LOS CASOS
     //  CUANDO EL GRADO ES 1 QUE USAMOS CALLOC ELSE REALOCC
+
+    // edit calloc se hace solo por cada vertice si el grado del vertice es 1> hacemos realloc para poder
+    //  agregar vecinos
+
+    //[1] -- esto es calloc 1
+    // otro vecino tu grado va a ser mayor que 1
+    //[1,2]
+    // cuando borro indice vecinos
     return new_vertice;
-}
+} */
 // revisar
 static void cargar_lado(Tupla *lista_lados, int i, unsigned int primero, unsigned int segundo) {
     lista_lados[i].x = primero;
     lista_lados[i].y = segundo;
 }
 
+// ordenar de menor a mayor primero respecto de la primera componente (x) y luego de la segunda (y)
 static int cmp_tuples(const void *a, const void *b) {
     Tupla *tupla_a = (Tupla *)a;
     Tupla *tupla_b = (Tupla *)b;
+    // vertice a y vertice b
+    //  (1, 3)
+    //  (1, 4)
+    //  (2, 1)
+    //  (3, 4)
+    //  (4, 1)
+    //  (4, 5)
+    //  (5, 6)
+    //  (5, 9)
+    //  (9, 5)
+    // a = 1 mientras se repita cargo los b
+    // last_charged = 1
+    // x < last_charged por orden ya se que lo cargue
+    // 2 < 1 no bueno lo agrego
+    //
+    //[1,3,4,2] list vert [1,2,3,4] orden natural
 
+    /*formas que no van:
+        cargar todos los a y despues todos los b
+        cargar y reordenar
+    */
     if (tupla_a->x < tupla_b->x) {
         return -1;
     } else if (tupla_a->x > tupla_b->x) {
@@ -85,10 +117,10 @@ static int cmp_tuples(const void *a, const void *b) {
 }
 
 static Grafo destroy_grafo(Grafo grafo) {
-    for (unsigned int i = 0; i < grafo->cant_lados; i++) {
-        free(grafo->list_vertices[i]->indice_vecinos);
-        grafo->list_vertices[i]->indice_vecinos = NULL;
-    }
+    /*    for (unsigned int i = 0; i < grafo->cant_lados; i++) {
+           free(grafo->list_vertices[i]->indice_vecinos);
+           grafo->list_vertices[i]->indice_vecinos = NULL;
+       } */
 
     free(grafo->list_vertices);
     grafo->list_vertices = NULL;
@@ -126,7 +158,7 @@ Grafo ConstruirGrafo(FILE *f_input) {
    si tengo una linea con otro formato deberia dar error,  despues de m lineas puede haber una cantidad arbitraria de lineas sin formato
    por lo que no tengo que seguir leyendo
     */
-    for (size_t i = 0; i < m; i++) {
+    for (unsigned int i = 0; i < m; i++) {
         fgets(line, sizeof(line), f_input);
         if (line[0] != 'e') {
             // ERROR en formato
@@ -167,17 +199,19 @@ unsigned int Delta(Grafo G) {
 // funciones de extraccion de informacion de vertices
 
 unsigned int Nombre(unsigned int i, Grafo G) {
-    return G->list_vertices[i]->nombre;
+    return G->list_vertices[i].nombre;
 }
 unsigned int Grado(unsigned int i, Grafo G) {
-    return G->list_vertices[i]->grado;
+    return G->list_vertices[i].grado;
 }
 
+// vertice i y  buscar el j-esimo vecino de i
+
 unsigned int IndiceVecino(unsigned int j, unsigned int i, Grafo G) {
-    if (i >= G->cant_vertices || j >= G->list_vertices[i]->grado) {
+    if (i >= G->cant_vertices || j >= G->list_vertices[i].grado) {
         return (2 ^ 32) - 1;
         // caso de error
     }
 
-    return G->list_vertices[i]->indice_vecinos[j];
+    return G->list_vertices[i].indice_vecinos[j];
 }

@@ -3,13 +3,21 @@
 
 #include "APIG23.h"
 
-typedef struct _s_vertice *vertice;
-
 typedef struct
 {
     unsigned int x;
     unsigned int y;
 } Tupla;
+
+//[punt a _s_vert,...,.]
+// direcciones de memoria
+//  0,................n
+// need pedir memoria para los _s_vertices
+typedef struct {
+    unsigned int  nombre;
+    unsigned int  grado;
+    unsigned int *indice_vecinos;
+} vertice;
 
 struct GrafoSt {
     vertice     *list_vertices;  // ordenar por indice
@@ -18,13 +26,6 @@ struct GrafoSt {
     unsigned int cant_lados;
     unsigned int mayor_grado;  // Δ
     unsigned int menor_grado;  // δ
-};
-
-struct _s_vertice {
-    unsigned int nombre;
-    // capaz indice creo que no vale la pena agregar ese campo
-    unsigned int  grado;
-    unsigned int *indice_vecinos;
 };
 
 /*
