@@ -98,9 +98,9 @@ static int cmp_tuples(const void *a, const void *b) {
     //[1,3,4,2] list vert [1,2,3,4] orden natural
 
     /*formas que no van:
-        cargar todos los a y despues todos los b
-        cargar y reordenar
-    */
+           cargar todos los a y despues todos los b
+           cargar y reordenar
+       */
     if (tupla_a->x < tupla_b->x) {
         return -1;
     } else if (tupla_a->x > tupla_b->x) {
@@ -178,16 +178,18 @@ Grafo ConstruirGrafo(FILE *f_input) {
             // cargar_lado(my_grafo->list_lados, i, x, y);
         }
     }
+}
 
-    // ordeno los lados de menor a mayor por primera y segunda componente
-    // ERROR: aca funciona para R22_93_15 pero tira malloc corrupted para el resto SE CLAVA ACAAAA
-    qsort(my_grafo->list_lados, my_grafo->cant_lados, sizeof(Tupla), cmp_tuples);
+// ordeno los lados de menor a mayor por primera y segunda componente
+// ERROR: aca funciona para R22_93_15 pero tira malloc corrupted para el resto SE CLAVA ACAAAA
 
-    for (unsigned int i = 0; i < my_grafo->cant_lados; i++) {
-        printf("%u lado = (%u,%u)\n", i + 1, my_grafo->list_lados[i].x, my_grafo->list_lados[i].y);
-    }
+qsort(my_grafo->list_lados, my_grafo->cant_lados, sizeof(Tupla), cmp_tuples);
 
-    return my_grafo;
+for (unsigned int i = 0; i < my_grafo->cant_lados; i++) {
+    printf("%u lado = (%u,%u)\n", i + 1, my_grafo->list_lados[i].x, my_grafo->list_lados[i].y);
+}
+
+return my_grafo;
 }
 
 void DestruirGrafo(Grafo G) {
