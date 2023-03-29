@@ -80,7 +80,6 @@ static void cargar_lado(Tupla *lista_lados, int i, unsigned int primero, unsigne
 static int cmp_tuples(const void *a, const void *b) {
     Tupla *tupla_a = (Tupla *)a;
     Tupla *tupla_b = (Tupla *)b;
-<<<<<<< HEAD
     // vertice a y vertice b
     //  (1, 3)
     //  (1, 4)
@@ -97,8 +96,6 @@ static int cmp_tuples(const void *a, const void *b) {
     // 2 < 1 no bueno lo agrego
     //
     //[1,3,4,2] list vert [1,2,3,4] orden natural
-=======
->>>>>>> origin/main
 
     /*formas que no van:
         cargar todos los a y despues todos los b
@@ -132,6 +129,8 @@ static Grafo destroy_grafo(Grafo grafo) {
 
     return NULL;
 }
+
+static void cargar_ordenado(){};
 ////////////////////////////////////////////////////////////////////////////////////////
 
 // construcci'on/destrucci'on
@@ -180,34 +179,6 @@ Grafo ConstruirGrafo(FILE *f_input) {
 
     for (unsigned int i = 0; i < my_grafo->cant_lados; i++) {
         printf("%u lado = (%u,%u)\n", i + 1, my_grafo->list_lados[i].x, my_grafo->list_lados[i].y);
-    }
-
-    unsigned int x_fijado, y_fijado;
-
-    struct _s_vertice vertice_iterativo;
-    // cargo los vertices
-    for (int i = 0; i < m; i++) {
-        // vertice_iterativo.nombre   = my_grafo->list_lados[i].x;
-        // vertice_iterativo.grado = my_grafo->list_lados[i].y;
-        //  VER como agregar vertice_iterativo.indice_vecinos el nuevo vecino
-
-        x_fijado                   = my_grafo->list_lados[i].x;
-        my_grafo->list_vertices[i] = x_fijado;
-        while (my_grafo->list_lados[i].x == x_fijado) {
-            y_fijado                       = my_grafo->list_lados[i].y;
-            my_grafo->list_vertices[i + 1] = y_fijado;
-            i++;
-        }
-    }
-    ////////////////////////////////////////////////////////////////////////
-    // Aca imprimo los vertices para ver que onda y despues tiro un error si se ordeno mal
-    for (int i = 0; i < n; i++) {
-        printf("vertice %d : %u\n", i, my_grafo->list_vertices[i]);
-    }
-    for (int i = 0; i < n; i++) {
-        if (i > 0 && my_grafo->list_vertices[i] <= my_grafo->list_vertices[i - 1]) {
-            printf("ERROR MAXIMO LPM NO SAFAMOS\n");
-        }
     }
 
     return my_grafo;
