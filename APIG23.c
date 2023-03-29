@@ -138,9 +138,10 @@ static void cargar_ordenado(){};
 Debo calcular el Delta
 */
 Grafo ConstruirGrafo(FILE *f_input) {
-    char         line[1024];
-    unsigned int n, m, x, y;
-    Grafo        my_grafo;
+    char          line[1024];
+    unsigned int  n, m, left, right;
+    unsigned int *left_edges, *right_edges;
+    Grafo         my_grafo;
 
     while (fgets(line, sizeof(line), f_input)) {
         if (line[0] == 'c') {
@@ -156,6 +157,9 @@ Grafo ConstruirGrafo(FILE *f_input) {
             return NULL;
         }
     }
+    left_edges  = calloc(m, sizeof(unsigned int));
+    right_edges = calloc(m, sizeof(unsigned int));
+
     /* Tengo que sacar las ultimas dos guardas, luego de encontrar la linea con p tengo m lineas de formato e num num donde cargo los lados,
    si tengo una linea con otro formato deberia dar error,  despues de m lineas puede haber una cantidad arbitraria de lineas sin formato
    por lo que no tengo que seguir leyendo
@@ -168,8 +172,10 @@ Grafo ConstruirGrafo(FILE *f_input) {
         } else {
             // revisar
             // aca entiendo deberiamos cargar desp ordenar y desp cargar los vertices pero pa eso deberiamos recorrer los vertices y eso esta raro
-            sscanf(line, "e %u %u", &x, &y);
-            cargar_lado(my_grafo->list_lados, i, x, y);
+            sscanf(line, "e %u %u", &right, &left);
+            left_edges[i]  = left;
+            right_edges[i] = right;
+            // cargar_lado(my_grafo->list_lados, i, x, y);
         }
     }
 
