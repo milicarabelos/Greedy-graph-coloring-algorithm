@@ -16,8 +16,6 @@ y la cantidad de lados
 */
 static Grafo init_grafo(unsigned int n, unsigned int m) {
 
-    printf("entre a init");
-
     Grafo new_grafo = calloc(1, sizeof(struct GrafoSt));
 
     if (new_grafo == NULL) {
@@ -25,14 +23,12 @@ static Grafo init_grafo(unsigned int n, unsigned int m) {
         return NULL;
     }
 
-    printf("antes de los lados");
-    // guardaste memoria para M tuplas
-    new_grafo->list_lados = (Tupla *)calloc(m, sizeof(Tupla));
+    // guardaste memoria para M*2 tuplas
+    new_grafo->list_lados = (Tupla *)calloc((2 * m), sizeof(Tupla));
     if (new_grafo->list_lados == NULL) {
         printf("Error no se pudo pedir la memoria para la lista de lados");
         return NULL;
     }
-    printf("desp de los lados");
     // guaradste memoria para una lista con N vertices
     // estos vertices fijate van a vivr en esos espacios de memoria
     new_grafo->list_vertices = calloc(n, sizeof(vertice));
@@ -41,39 +37,19 @@ static Grafo init_grafo(unsigned int n, unsigned int m) {
         return NULL;
     }
     new_grafo->cant_vertices = n;
-    new_grafo->cant_lados    = m;
-    new_grafo->mayor_grado   = 0;
-    new_grafo->menor_grado   = 0;
+    new_grafo->cant_lados = m;
+    new_grafo->mayor_grado = 0;
+    new_grafo->menor_grado = 0;
 
     return new_grafo;
 }
 
-/* static vertice init_vertice(unsigned int nombre) {
-    vertice new_vertice = calloc(1, sizeof(struct _s_vertice));
-    if (new_vertice == NULL) {
-        printf("Error pidiendo memoria para el vertice");
-        return NULL;
-    }
-    new_vertice->nombre         = nombre;
-    new_vertice->grado          = 0;
-    new_vertice->indice_vecinos = calloc(1, sizeof(unsigned int));
-    // VER ACA COMO PEDIR BIEN LA MEMORIA DE LOS VECINOS PODEMOS PONER NULL Y DESPUES CADA QUE
-    // AGREGEMOS UN VECINO VAMOS HACIENDO REALLOC ME PARECE BUENA IDEA TOTAL DIFERENCIAMOS LOS CASOS
-    //  CUANDO EL GRADO ES 1 QUE USAMOS CALLOC ELSE REALOCC
-
-    // edit calloc se hace solo por cada vertice si el grado del vertice es 1> hacemos realloc para poder
-    //  agregar vecinos
-
-    //[1] -- esto es calloc 1
-    // otro vecino tu grado va a ser mayor que 1
-    //[1,2]
-    // cuando borro indice vecinos
-    return new_vertice;
-} */
 // revisar
 static void cargar_lado(Tupla *lista_lados, int i, unsigned int primero, unsigned int segundo) {
     lista_lados[i].x = primero;
     lista_lados[i].y = segundo;
+    lista_lados[i + 1].x = segundo;
+    lista_lados[i + 1].y = primero;
 }
 
 // ordenar de menor a mayor primero respecto de la primera componente (x) y luego de la segunda (y)
@@ -116,6 +92,28 @@ static int cmp_tuples(const void *a, const void *b) {
     }
 }
 
+static void cargar_vertices(Grafo G) {
+    unsigned int last_charged;
+    unsigned int grado = 0;
+    unsigned int indice_vert = 0;
+
+    last_charged = G->list_lados[indice_vert].x;
+    G->list_vertices[indice_vert].nombre = last_charged;
+    G->list_vertices[indice_vert].indice = indice_vert;
+    for (unsigned int i = 0; i < G->cant_lados * 2; i++) {
+        if (G->list_lados[i].x == last_charged) {
+            grado++;
+            G->list_vertices[indice_vert].grado = grado;
+        } else {
+            indice_vert++;
+            last_charged = G->list_lados[i].x;
+            G->list_vertices[indice_vert].nombre = last_charged;
+            G->list_vertices[indice_vert].indice = indice_vert;
+            grado = 1;
+        }
+    }
+}
+
 static Grafo destroy_grafo(Grafo grafo) {
     /*    for (unsigned int i = 0; i < grafo->cant_lados; i++) {
            free(grafo->list_vertices[i]->indice_vecinos);
@@ -138,10 +136,9 @@ static void cargar_ordenado(){};
 Debo calcular el Delta
 */
 Grafo ConstruirGrafo(FILE *f_input) {
-    char          line[1024];
-    unsigned int  n, m, left, right;
-    unsigned int *left_edges, *right_edges;
-    Grafo         my_grafo;
+    char line[1024];
+    unsigned int n, m, x, y;
+    Grafo my_grafo;
 
     while (fgets(line, sizeof(line), f_input)) {
         if (line[0] == 'c') {
@@ -151,20 +148,19 @@ Grafo ConstruirGrafo(FILE *f_input) {
             sscanf(line, "p edge %u %u", &n, &m);
             printf("n = %u, m = %u\n", n, m);
             my_grafo = init_grafo(n, m);
+
             break;
         } else {
             // En caso de error devuelvo NULL
             return NULL;
         }
     }
-    left_edges  = calloc(m, sizeof(unsigned int));
-    right_edges = calloc(m, sizeof(unsigned int));
 
     /* Tengo que sacar las ultimas dos guardas, luego de encontrar la linea con p tengo m lineas de formato e num num donde cargo los lados,
    si tengo una linea con otro formato deberia dar error,  despues de m lineas puede haber una cantidad arbitraria de lineas sin formato
    por lo que no tengo que seguir leyendo
     */
-    for (unsigned int i = 0; i < m; i++) {
+    for (unsigned int i = 0; i < m * 2; i = i + 2) {
         fgets(line, sizeof(line), f_input);
         if (line[0] != 'e') {
             // ERROR en formato
@@ -172,24 +168,30 @@ Grafo ConstruirGrafo(FILE *f_input) {
         } else {
             // revisar
             // aca entiendo deberiamos cargar desp ordenar y desp cargar los vertices pero pa eso deberiamos recorrer los vertices y eso esta raro
-            sscanf(line, "e %u %u", &right, &left);
-            left_edges[i]  = left;
-            right_edges[i] = right;
-            // cargar_lado(my_grafo->list_lados, i, x, y);
+            sscanf(line, "e %u %u", &x, &y);
+            cargar_lado(my_grafo->list_lados, i, x, y);
         }
     }
-}
 
-// ordeno los lados de menor a mayor por primera y segunda componente
-// ERROR: aca funciona para R22_93_15 pero tira malloc corrupted para el resto SE CLAVA ACAAAA
+    // ordeno los lados de menor a mayor por primera y segunda componente
+    // ERROR: aca funciona para R22_93_15 pero tira malloc corrupted para el resto SE CLAVA ACAAAA
+    // printf("antes del sort");
+    qsort(my_grafo->list_lados, my_grafo->cant_lados * 2, sizeof(Tupla), cmp_tuples);
+    printf("\nlados\n");
+    for (unsigned int i = 0; i < my_grafo->cant_lados * 2; i++) {
+        printf("%u lado = (%u,%u)\n", (i + 1), my_grafo->list_lados[i].x, my_grafo->list_lados[i].y);
+    }
 
-qsort(my_grafo->list_lados, my_grafo->cant_lados, sizeof(Tupla), cmp_tuples);
+    // ete aqui la señora
+    cargar_vertices(my_grafo);
 
-for (unsigned int i = 0; i < my_grafo->cant_lados; i++) {
-    printf("%u lado = (%u,%u)\n", i + 1, my_grafo->list_lados[i].x, my_grafo->list_lados[i].y);
-}
+    printf("\n");
+    printf("vertices: \n");
+    for (unsigned int i = 0; i < my_grafo->cant_vertices; i++) {
+        printf("i:%u vert:%u\n", i, my_grafo->list_vertices[i].nombre);
+    }
 
-return my_grafo;
+    return my_grafo;
 }
 
 void DestruirGrafo(Grafo G) {

@@ -17,6 +17,7 @@ typedef struct {
     unsigned int  nombre;
     unsigned int  grado;
     unsigned int *indice_vecinos;
+    unsigned int  indice;
 } vertice;
 
 struct GrafoSt {
