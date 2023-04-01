@@ -1,7 +1,7 @@
 #ifndef EstructuraGrafo23_H
 #define EstructuraGrafo23_H
 
-#include "APIG23.h"
+typedef unsigned int u32;
 
 typedef struct
 {
@@ -14,20 +14,20 @@ typedef struct
 //  0,................n
 // need pedir memoria para los _s_vertices
 typedef struct {
-    unsigned int  nombre;
-    unsigned int  grado;
+    unsigned int nombre;
+    unsigned int grado;
     unsigned int *indice_vecinos;
-    unsigned int  indice;
+    unsigned int indice;
 } vertice;
 
-struct GrafoSt {
-    vertice     *list_vertices;  // ordenar por indice
-    Tupla       *list_lados;     // ordenar para cargar vertices
+typedef struct {
+    vertice *list_vertices;  // ordenar por indice
+    Tupla *list_lados;       // ordenar para cargar vertices
     unsigned int cant_vertices;
     unsigned int cant_lados;
     unsigned int mayor_grado;  // Δ
     unsigned int menor_grado;  // δ
-};
+} GrafoSt;
 
 /*
 Crea un nuevo grafo con la cantidad de vertices

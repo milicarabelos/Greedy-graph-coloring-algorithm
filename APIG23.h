@@ -10,7 +10,7 @@
 #ifndef APIG23_H
 #define APIG23_H
 
-typedef struct GrafoSt *Grafo;
+typedef GrafoSt *Grafo;
 
 // construcci'on/destrucci'on
 
