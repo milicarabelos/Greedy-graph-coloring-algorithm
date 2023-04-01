@@ -14,6 +14,7 @@ int main() {
     }
     Grafo my_graph = ConstruirGrafo(fp);
     // Aca tengo que llamar a Construir Grafo mandandole el fp
+    DestruirGrafo(my_graph);
     fclose(fp);
     return 0;
 }
