@@ -26,7 +26,6 @@ typedef struct {
     unsigned int cant_vertices;
     unsigned int cant_lados;
     unsigned int mayor_grado;  // Δ
-    unsigned int menor_grado;  // δ
 } GrafoSt;
 
 /*
