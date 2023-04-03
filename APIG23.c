@@ -43,7 +43,6 @@ static Grafo init_grafo(u32 n, u32 m) {
     new_grafo->cant_vertices = n;
     new_grafo->cant_lados = m;
     new_grafo->mayor_grado = 0;
-    new_grafo->menor_grado = 0;
 
     return new_grafo;
 }
@@ -76,9 +75,9 @@ static int cmp_tuples(const void *a, const void *b) {
     }
 }
 
-static int binary_search(Grafo G, u32 vertex_index, u32 target_name) {
+static int binary_search(Grafo G, u32 target_name) {
     u32 left = 0;
-    u32 right = G->list_vertices[vertex_index].grado - 1;
+    u32 right = G->cant_vertices - 1;
     u32 pivot;
     u32 vecino;
     while (left <= right) {
@@ -98,32 +97,40 @@ static int binary_search(Grafo G, u32 vertex_index, u32 target_name) {
 
 static void cargar_vecinos(Grafo G) {
     u32 indice;
+    u32 max_grade = 0;
     // printf("Cargando vecinos.\n");
     for (u32 i = 0; i < G->cant_vertices; i++) {
+        if (G->list_vertices[i].grado > max_grade) {
+            max_grade = G->list_vertices[i].grado;
+        }
         for (u32 j = 0; j < G->list_vertices[i].grado; j++) {
             // printf("Cargando vecino %u del vertice %u\n", j, G->list_vertices[i].nombre);
-            indice = binary_search(G, i, G->list_vertices[i].indice_vecinos[j]);
+            indice = binary_search(G, G->list_vertices[i].indice_vecinos[j]);
             if (indice != -1) {
-                /*
-                printf("Nombre del vecino antes: %u", G->list_vertices[i].indice_vecinos[j]);
-                printf("\nNombre del vecino buscado con indice obtenido: %u\n\n",  G->list_vertices[indice].nombre);
-                */
+                // printf("Nombre del vertice: %u ", G->list_vertices[i].nombre);
+                // printf("Nombre del vecino antes: %u", G->list_vertices[i].indice_vecinos[j]);
+                ////    printf(" GRADO %u", G->list_vertices[i].grado);
+                // printf("\nNombre del vecino buscado con indice obtenido: %u\n\n", G->list_vertices[indice].nombre);
+
                 G->list_vertices[i].indice_vecinos[j] = indice;
             }
         }
     }
+    G->mayor_grado = max_grade;
     // printf("Vecinos Cargados :).\n");
 }
 
 static void cargar_vertices(Grafo G) {
-    u32 last_charged = -1;
+    u32 last_charged = NULL;
     u32 grado = 0;
     u32 indice_vert = 0;
     u32 **general_vecinos = calloc(G->cant_vertices, sizeof(u32 *));
 
-    last_charged = G->list_lados[indice_vert].x;
-    G->list_vertices[indice_vert].nombre = last_charged;
+    // cargo el primer vertice y su indice
+    G->list_vertices[indice_vert].nombre = G->list_lados[indice_vert].x;
+    last_charged = G->list_vertices[indice_vert].nombre;
     G->list_vertices[indice_vert].indice = indice_vert;
+
     for (u32 i = 0; i < G->cant_lados * 2; i++) {
         if (G->list_lados[i].x == last_charged) {
             grado++;
@@ -136,17 +143,23 @@ static void cargar_vertices(Grafo G) {
             G->list_vertices[indice_vert].indice = indice_vert;
             G->list_vertices[indice_vert].grado = grado;
         }
+
         general_vecinos[indice_vert] = realloc(general_vecinos[indice_vert], grado * sizeof(u32));
+        // printf("%u \n", general_vecinos[indice_vert]);
         general_vecinos[indice_vert][grado - 1] = G->list_lados[i].y;
     }
 
     // update the vertex arrays with the neighbor lists
     for (u32 i = 0; i < G->cant_vertices; i++) {
         G->list_vertices[i].indice_vecinos = calloc(G->list_vertices[i].grado, sizeof(u32));
+        // printf("list_vecinos de %u\n", G->list_vertices[i].nombre);
 
+        // printf("[");
         for (u32 j = 0; j < G->list_vertices[i].grado; j++) {
             G->list_vertices[i].indice_vecinos[j] = general_vecinos[i][j];
+            // printf("%u,", G->list_vertices[i].indice_vecinos[j]);
         }
+        // printf("] \n");
         free(general_vecinos[i]);
     }
     free(general_vecinos);
@@ -171,7 +184,8 @@ static Grafo destroy_grafo(Grafo grafo) {
 /*debe leer desde stdin
 Debo calcular el Delta
 */
-Grafo ConstruirGrafo(FILE *f_input) {
+Grafo ConstruirGrafo() {
+    FILE *f_input = stdin;
     char line[1024];
     u32 n, m, x, y;
     Grafo my_grafo;
