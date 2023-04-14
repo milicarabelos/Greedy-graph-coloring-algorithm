@@ -69,54 +69,39 @@ char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
         return (char)1;
     }
 
-    u32 *impares = calloc(n, sizeof(u32));
-    if (impares == NULL) {
-        free(pares);
-        return (char)1;
-    }
-
     qsort(Color, n, sizeof(u32), cmp_ascendente);
 
-    u32 last_charged = Color[0];
+    
+    u32 last_charged = Color[0]; //== 0
     u32 ind_impar = 0;
+    u32 ind_par = 0;
 
     for (u32 ind_col = 0; ind_col < n; ind_col++) {
-        u32 ind_par = 0;
 
         if (Color[ind_col] % 2 == 0 && (Color[ind_col] != last_charged || ind_col == 0)) {
             pares[ind_par] = Color[ind_col];
             last_charged = Color[ind_col];
             ind_par++;
         }
-        // siempre mi color empieza en 0 asi que no necesito chequear i!=0
+        // siempre mi color empieza en 0 asi que no necesito chequear i==0
         else if (Color[ind_col] % 2 != 0 && Color[ind_col] != last_charged){
-            impares[ind_impar] = Color[ind_col];
+            Orden[ind_impar] = Color[ind_col];
             last_charged = Color[ind_col];
             ind_impar++;
         }
     }
 
-    u32 i = 0;
-    for (u32 ind = ind_impar - 1; ind >= 0; ind--) {
+    for (u32 ind = 0 ; ind < ind_par; ind++) {
 
-            Orden[i] = impares[ind];
-            i++;
-    }
-
-    i=0;
-    for (u32 ind = i + 1; ind < n; ind++) {
-
-        Orden[i] = pares[ind];
-        i++;
+        Orden[ind_impar] = pares[ind];
+        ind_impar++;
     }
 
     free(pares);
     pares = NULL;
-    free(impares);
-    impares = NULL;
-
     return (char)0;
 }
 
 char OrdenJedi(Grafo G, u32 *Orden, u32 *Color) {
+    
 }
