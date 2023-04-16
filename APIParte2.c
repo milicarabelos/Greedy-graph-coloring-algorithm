@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 int cmp_ascendente(const void *a, const void *b) {
     return (*(int *)a - *(int *)b);
@@ -124,3 +125,44 @@ char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
 /* char OrdenJedi(Grafo G, u32 *Orden, u32 *Color) {
 
 } */
+
+char OrdenNaturalReverse(u32 n, u32* Orden, u32* Color){
+    u32 last_charged = Color[n - 1]; //== 0
+
+    qsort(Color, n, sizeof(u32), cmp_ascendente);
+
+    for (u32 ind_col = 0; ind_col < n; ind_col++) {
+        if ((Color[ind_col] != last_charged)) {
+            last_charged = Color[n - ind_col - 1];
+        }
+        Orden[ind_col] = last_charged;
+    }
+}
+
+char OrdenNatural(u32 n, u32* Orden, u32* Color){
+    u32 last_charged = Color[0]; //== 0
+
+    qsort(Color, n, sizeof(u32), cmp_ascendente);
+
+    for (u32 ind_col = 0; ind_col < n; ind_col++) {
+        if ((Color[ind_col] != last_charged)) {
+            last_charged = Color[ind_col];
+        }
+        Orden[ind_col] = last_charged;
+    }
+}
+
+
+char OrdenAleatorio(u32 n, u32* Orden, u32* Color){
+    unsigned int random_id = 0;
+    u32 last_charged = Color[random_id]; //== 0
+    qsort(Color, n, sizeof(u32), cmp_ascendente);
+
+    for (u32 ind_col = 0; ind_col < n; ind_col++) {
+        while ((Color[random_id] == last_charged)) {
+            random_id = rand() % n;
+            last_charged = Color[random_id];
+        }
+        Orden[ind_col] = last_charged;
+    }
+}

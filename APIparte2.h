@@ -20,4 +20,13 @@ char OrdenImparPar(u32 n, u32* Orden, u32* Color);
 // ordena indices en la forma especial dada en las especificaciones
 //char OrdenJedi(Grafo G, u32* Orden, u32* Color);
 
+
+/*ordena los indices de manera inversa*/
+char OrdenNatural(u32 n, u32* Orden, u32* Color);
+
+/*ordena los indices de manera inversa*/
+char OrdenNaturalReverse(u32 n, u32* Orden, u32* Color);
+
+/*ordena los indices de manera inversa*/
+char OrdenAleatorio(u32 n, u32* Orden, u32* Color);
 #endif
