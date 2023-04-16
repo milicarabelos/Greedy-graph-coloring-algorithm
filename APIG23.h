@@ -12,10 +12,10 @@
 
 typedef GrafoSt *Grafo;
 
-// construcci'on/destrucci'on
+// construccion/destruccion
 
 // debe leer desde stdin
-Grafo ConstruirGrafo();
+Grafo ConstruirGrafo(FILE *f_input);
 
 void DestruirGrafo(Grafo G);
 

@@ -14,6 +14,19 @@
 /*Crea un nuevo grafo con la cantidad de vertices
 y la cantidad de lados
 */
+/* static print_graph(Grafo G) {
+    printf("Vertices: %u\n", G->cant_vertices);
+    printf("Lados: %u\n", G->cant_lados);
+    printf("Mayor grado: %u\n", G->mayor_grado);
+         for (u32 i = 0; i < G->cant_vertices; i++) {
+            printf("Vertice %u: ", G->list_vertices[i].nombre);
+            printf("Grado %u: ", G->list_vertices[i].grado);
+            for (u32 j = 0; j < G->list_vertices[i].grado; j++) {
+                printf("%u ", G->list_vertices[i].indice_vecinos[j]);
+            }
+            printf("\n");
+        }
+} */
 
 static Grafo init_grafo(u32 n, u32 m) {
 
@@ -184,8 +197,8 @@ static Grafo destroy_grafo(Grafo grafo) {
 /*debe leer desde stdin
 Debo calcular el Delta
 */
-Grafo ConstruirGrafo() {
-    FILE *f_input = stdin;
+Grafo ConstruirGrafo(FILE *f_input) {
+    //FILE *f_input = stdin;
     char line[1024];
     u32 n, m, x, y;
     Grafo my_grafo;
@@ -232,6 +245,8 @@ Grafo ConstruirGrafo() {
 
     // carga de vecinos
     cargar_vecinos(my_grafo);
+
+    // print_graph(my_grafo);
 
     return my_grafo;
 }
