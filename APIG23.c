@@ -29,7 +29,6 @@ y la cantidad de lados
 } */
 
 static Grafo init_grafo(u32 n, u32 m) {
-
     Grafo new_grafo = calloc(1, sizeof(GrafoSt));
 
     if (new_grafo == NULL) {
@@ -198,7 +197,7 @@ static Grafo destroy_grafo(Grafo grafo) {
 Debo calcular el Delta
 */
 Grafo ConstruirGrafo(FILE *f_input) {
-    //FILE *f_input = stdin;
+    // FILE *f_input = stdin;
     char line[1024];
     u32 n, m, x, y;
     Grafo my_grafo;

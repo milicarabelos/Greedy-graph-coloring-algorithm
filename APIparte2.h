@@ -18,6 +18,6 @@ Aca no es necesaria la estructura de G, solo n.*/
 char OrdenImparPar(u32 n, u32* Orden, u32* Color);
 
 // ordena indices en la forma especial dada en las especificaciones
-//char OrdenJedi(Grafo G, u32* Orden, u32* Color);
+// char OrdenJedi(Grafo G, u32* Orden, u32* Color);
 
 #endif

@@ -14,75 +14,92 @@ int cmp_descendente(const void *a, const void *b) {
     return num2 - num1;
 }
 
+// esta funcion devuelve el primer color disponible para un vertice de acuerdo a los colores de sus vecinos
+static u32 primer_color_disponible(u32 i, Grafo G, u32 *Orden, u32 *Color) {
+    u32 n = NumeroDeVertices(G);
+    u32 min_col = 0;
+    u32 vertice = Orden[i];
+    u32 grado_vertice = Grado(vertice, G);
+    u32 ultimo_color_chequeado = n + 2;  // inicializacion en un color que no se usa nunca en greedy
+    u32 *vecinos_colores = calloc(grado_vertice, sizeof(u32));
+
+    for (u32 i = 0; i < grado_vertice; i++) {
+        vecinos_colores[i] = Color[IndiceVecino(i, vertice, G)];
+    }
+
+    qsort(vecinos_colores, grado_vertice, sizeof(u32), cmp_ascendente);
+
+    // como el array esta ordenado de menor a mayor si mi color es menor que el minimo
+    // puedo usarlo
+    if (min_col < vecinos_colores[0]) {
+        free(vecinos_colores);
+        vecinos_colores = NULL;
+        return min_col;
+    }
+
+    for (u32 i = 0; i < grado_vertice; i++) {
+        // si llego a un vertice que aun no fue coloreado no lo miro ni a los siguientes
+        if (vecinos_colores[i] == n + 2) {
+            free(vecinos_colores);
+            vecinos_colores = NULL;
+            return min_col;
+        }
+
+        // si el color esta repetido no lo miro
+        while (vecinos_colores[i] == ultimo_color_chequeado) {
+            i++;
+        }
+
+        // si el color es igual al minimo que quiero usar aumento mi minimo pues no puedo usar
+        //  ese color
+        if (min_col == vecinos_colores[i]) {
+            ultimo_color_chequeado = vecinos_colores[i];
+            min_col++;
+        } else {  // si no es igual quiere decir que min_col es menor por el orden ascendente uso este min_col
+            free(vecinos_colores);
+            vecinos_colores = NULL;
+            return min_col;
+        }
+    }
+
+    return n + 2;
+}
+
+// funcion encargada de asignar el minimo color posible a un vertice i y actualizar el maximo color usado
+//  ya que max_color_used + 1 es la cant de colores que use para greedy en total
+static u32 asignar_color(u32 i, Grafo G, u32 *Orden, u32 *Color, u32 max_color_used) {
+    u32 color = primer_color_disponible(i, G, Orden, Color);
+
+    if (max_color_used < color) {
+        max_color_used = color;
+    }
+
+    Color[Orden[i]] = color;
+    return max_color_used;
+}
+
 u32 Greedy(Grafo G, u32 *Orden, u32 *Color) {
     u32 n = NumeroDeVertices(G);
-    printf("n = %d\n", n);
-    u32 cant_col = 1; //cantidad de colores que uso
-    u32 ultimo_col = 0; //el mayot que use
+    u32 max_color_used = 0;
 
-    // inicializo el color de todos los vertices en n+2
-    // este color no se usaria nunca en un coloreo propio
+    // inicializo el color de todos los vertices en n+2 este color no se usaria nunca en un coloreo propio
     for (u32 i = 0; i < n; i++) {
         Color[i] = n + 2;
     }
 
-    printf("greedy inicializado\n");
-    //  Asigno el primer color a primer vertice
-    //Color[Orden[0]] = 0;
+    // asignar el primer color al primer vertice
+    Color[Orden[0]] = 0;
 
-    for (u32 i = 0; i < n; i++) {
-
-        u32 min_col = 0;
-        u32 vertice = Orden[i];
-        u32 grado_vertice = Grado(vertice, G);
-        u32 *vecinos_colores = calloc(grado_vertice, sizeof(u32));
-
-        //printf("greedy iteracion 1 i=%d\n", i);
-
-        for (unsigned j = 0; j < grado_vertice; j++) {
-            vecinos_colores[j] = Color[IndiceVecino(j, vertice, G)];
-            //printf("greedy iteracion 2 j =%d\n", j);
-        }
-
-        // Ordeno los colores de los vecinos
-        qsort(vecinos_colores, grado_vertice, sizeof(u32), cmp_ascendente);
-
-        if (vecinos_colores[0] == n + 2) {
-            Color[vertice] = 0;
-        } 
-        else {
-
-            for (u32 j = 0; j < grado_vertice; j++) {
-                // empiezo a recorrer desde el color minimo de los vecinos si no es el min_col
-                // resulta que el color es mayor que el min_col, entonces puedo usarlo y hago break
-                u32 color_repetido = n+2;
-
-                if (min_col == vecinos_colores[j] && vecinos_colores[j] != color_repetido) {
-                    //QUE PASA SI LOS COLORES SE REPITEN??
-                    color_repetido = vecinos_colores[j];
-                    min_col++;
-                    if (min_col > ultimo_col) {
-                        ultimo_col = min_col;
-                        cant_col++;
-                    }
-                } else {
-                    break;
-                }
-                //printf("colores iteracion %d\n", j);
-            }
-
-            Color[vertice] = min_col;
-        }
-
-        free(vecinos_colores);
-        vecinos_colores = NULL;
+    // asignar el minimo color posible a los demas vertices
+    for (u32 i = 1; i < n; i++) {
+        max_color_used = asignar_color(i, G, Orden, Color, max_color_used);
     }
 
-    return cant_col;
+    // el maximo color usado + 1 es la cantidad de colores usados
+    return max_color_used + 1;
 }
 
 char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
-
     u32 *pares = calloc(n, sizeof(u32));
     if (pares == NULL) {
         return (char)1;
@@ -90,28 +107,25 @@ char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
 
     qsort(Color, n, sizeof(u32), cmp_ascendente);
 
-    
-    u32 last_charged = Color[0]; //== 0
+    u32 last_charged = Color[0];  //== 0
     u32 ind_impar = 0;
     u32 ind_par = 0;
 
     for (u32 ind_col = 0; ind_col < n; ind_col++) {
-
         if (Color[ind_col] % 2 == 0 && (Color[ind_col] != last_charged || ind_col == 0)) {
             pares[ind_par] = Color[ind_col];
             last_charged = Color[ind_col];
             ind_par++;
         }
         // siempre mi color empieza en 0 asi que no necesito chequear i==0
-        else if (Color[ind_col] % 2 != 0 && Color[ind_col] != last_charged){
+        else if (Color[ind_col] % 2 != 0 && Color[ind_col] != last_charged) {
             Orden[ind_impar] = Color[ind_col];
             last_charged = Color[ind_col];
             ind_impar++;
         }
     }
 
-    for (u32 ind = 0 ; ind < ind_par; ind++) {
-
+    for (u32 ind = 0; ind < ind_par; ind++) {
         Orden[ind_impar] = pares[ind];
         ind_impar++;
     }
