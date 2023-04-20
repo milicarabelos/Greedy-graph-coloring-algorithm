@@ -136,12 +136,36 @@ char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
     return (char)0;
 }
 
-/* char OrdenJedi(Grafo G, u32 *Orden, u32 *Color) {
-
-} */
-
-char OrdenNaturalReverse(u32 n, u32* Orden, u32* Color){
-    u32 last_charged = Color[n - 1]; //== 0
+char OrdenJedi(Grafo G, u32 *Orden, u32 *Color) {
+    u32 acum = 0;
+    u32 n = NumeroDeVertices(G);
+    u32 r = 0;
+    // cantidad de colores
+    for (u32 i = 0; Color[i] != NULL; i++) {
+        r += 1;
+    }
+    for (u32 i = 0; i < r; i++) {
+        // sumatoria de grado de los vertices de color i
+        for (u32 j = 0; j < n; j++) {
+            if (Color[j] == i) {
+                acum += Grado(j, G);
+            }
+        }
+        acum = acum * i;
+        Orden[i] = acum;
+        acum = 0;
+    }
+    qsort(Orden, r, sizeof(u32), cmp_descendente);
+    for (u32 i = 1; Orden[i] != NULL; i++) {
+        if (Orden[i] > Orden[i - 1]) {
+            return '1';
+        }
+    }
+    return '0';
+    // Ver cuando retorna '1'
+}
+char OrdenNaturalReverse(u32 n, u32 *Orden, u32 *Color) {
+    u32 last_charged = Color[n - 1];  //== 0
 
     qsort(Color, n, sizeof(u32), cmp_ascendente);
 
@@ -153,8 +177,8 @@ char OrdenNaturalReverse(u32 n, u32* Orden, u32* Color){
     }
 }
 
-char OrdenNatural(u32 n, u32* Orden, u32* Color){
-    u32 last_charged = Color[0]; //== 0
+char OrdenNatural(u32 n, u32 *Orden, u32 *Color) {
+    u32 last_charged = Color[0];  //== 0
 
     qsort(Color, n, sizeof(u32), cmp_ascendente);
 
@@ -166,10 +190,9 @@ char OrdenNatural(u32 n, u32* Orden, u32* Color){
     }
 }
 
-
-char OrdenAleatorio(u32 n, u32* Orden, u32* Color){
+char OrdenAleatorio(u32 n, u32 *Orden, u32 *Color) {
     unsigned int random_id = 0;
-    u32 last_charged = Color[random_id]; //== 0
+    u32 last_charged = Color[random_id];  //== 0
     qsort(Color, n, sizeof(u32), cmp_ascendente);
 
     for (u32 ind_col = 0; ind_col < n; ind_col++) {
