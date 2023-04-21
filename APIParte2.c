@@ -141,6 +141,7 @@ u32 Greedy(Grafo G, u32 *Orden, u32 *Color) {
         } 
         else {
             u32 color_repetido = n+2;
+            u32 ultimo_col = 0;
             for (u32 j = 0; j < grado_vertice; j++) {
                 // empiezo a recorrer desde el color minimo de los vecinos si no es el min_col
                 // resulta que el color es mayor que el min_col, entonces puedo usarlo y hago break
@@ -149,7 +150,7 @@ u32 Greedy(Grafo G, u32 *Orden, u32 *Color) {
                     min_col++;
                     if (min_col > ultimo_col) {
                         ultimo_col = min_col;
-                        cant_col++;
+                        max_color_used++;
                     }
                 } else {
                     break;
@@ -327,37 +328,30 @@ char OrdenJedi(Grafo G, u32 *Orden, u32 *Color) {
 }
 
 
-char OrdenNatural(u32 n, u32 *Orden, u32 *Color) {
-    u32 last_charged = Color[0];  //== 0
-
-    qsort(Color, n, sizeof(u32), cmp_ascendente);
-
-    for (u32 ind_col = 0; ind_col < n; ind_col++) {
-        if ((Color[ind_col] != last_charged)) {
-            last_charged = Color[ind_col];
-        }
-        Orden[ind_col] = last_charged;
-
-// Ver de hacer static por tema del .h, o ver dodne poner las funciones
-void OrdenNaturalReverse(u32 n, u32* Orden, Grafo my_graph){
-    for(u32 i=0; i < my_graph->cant_vertices; i++){
-        Orden[i] = my_graph->list_vertices[n - 1 - i].nombre;
-        printf("Orden[%d] = %d\n", i, Orden[i]);
+void OrdenNatural(u32 n, u32 *Orden) {
+    for (u32 i = 0; i < n; i++) {
+        Orden[i] = i;
     }
-    return 0;
 }
 
-char OrdenAleatorio(u32 n, u32 *Orden, u32 *Color) {
+// Ver de hacer static por tema del .h, o ver dodne poner las funciones
+void OrdenNaturalReverse(u32 n, u32* Orden){
+    for(u32 i=n-1; i >=  0; i--){
+        Orden[n-i-1] = i;
+    }
+}
+
+void OrdenAleatorio(u32 n, u32 *Orden) {
     unsigned int random_id = 0;
-    u32 last_charged = Color[random_id];  //== 0
-    qsort(Color, n, sizeof(u32), cmp_ascendente);
+    bool used[n]; // Guardamos los numeros ya usados
+    memset(used, false, n * sizeof(bool)); // inicializamos en 0
 
     for (u32 ind_col = 0; ind_col < n; ind_col++) {
-        while ((Color[random_id] == last_charged)) {
+        while (used[random_id]){ // Si el numero ya fue usado, busco otro
             random_id = rand() % n;
-            last_charged = Color[random_id];
-        }
-        Orden[ind_col] = last_charged;
+        } 
+        
+        Orden[ind_col] = random_id;
+        used[random_id] = true; // Marco el numero como usado
     }
-    return 0;
 }

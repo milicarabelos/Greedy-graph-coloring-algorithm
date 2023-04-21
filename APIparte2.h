@@ -22,13 +22,13 @@ char OrdenImparPar(u32 n, u32* Orden, u32* Color);
 
 
 /*ordena los indices de manera natural*/
-void OrdenNatural(u32 n, u32* Orden, Grafo my_graph);
+void OrdenNatural(u32 n, u32* Orden);
 
 /*ordena los indices de manera antural a la inversa*/
-void OrdenNaturalReverse(u32 n, u32* Orden, Grafo my_graph);
+void OrdenNaturalReverse(u32 n, u32* Orden);
 
 /*ordena los indices de manera aleatoria*/
-void OrdenAleatorio(u32 n, u32* Orden, Grafo my_graph);
+void OrdenAleatorio(u32 n, u32* Orden);
 
 void OrdenWelshPowell(u32 n, u32* Orden, Grafo my_graph);
 #endif
