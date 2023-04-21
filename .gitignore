@@ -1,2 +1,4 @@
 *.o
 myprogram
+/Grafos
+.gitignore
