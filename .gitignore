@@ -1,4 +1,9 @@
 *.o
 myprogram
-/Grafos
 .gitignore
+execute
+.vscode
+Grafos/
+Parte2delProyecto2023.pdf
+output.txt
+diff_de_Apis.txt
