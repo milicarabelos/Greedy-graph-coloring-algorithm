@@ -6,6 +6,26 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef struct set_vetices {
+    u32 *vertices;
+    u32 len_vertices;
+    u32 color;
+    u32 fun_grado;
+} set_vertices;
+
+int cmp_fun_grado(const void *a, const void *b) {
+    set_vertices *x = (const set_vertices *)a;
+    set_vertices *y = (const set_vertices *)b;
+
+    if (x->fun_grado < y->fun_grado) {
+        return 1;
+    } else if (x->fun_grado > y->fun_grado) {
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
 int cmp_ascendente(const void *a, const void *b) {
     return (*(int *)a - *(int *)b);
 }
@@ -205,9 +225,62 @@ char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
     return 0;
 }
 
-/* char OrdenJedi(Grafo G, u32 *Orden, u32 *Color) {
+char OrdenJedi(Grafo G, u32 *Orden, u32 *Color) {
+    u32 n = NumeroDeVertices(G);
+    set_vertices *aux_struct;
+    u32 acum = 0;
+    u32 r = 0;
+    u32 index_vertex = 0;
 
-} */
+    for (u32 i = 0; i < n; i++) {
+        if (Color[i] > r) {
+            r = Color[i];
+        }
+    }
+    r++;
+
+    aux_struct = calloc(r, sizeof(set_vertices));
+
+    for (u32 i = 0; i < r; i++) {
+        aux_struct[i].color = i;
+        aux_struct[i].vertices = calloc(Delta(G), sizeof(u32));
+        aux_struct[i].len_vertices = 0;
+        // sumatoria de grado de los vertices de color i
+        for (u32 j = 0; j < n; j++) {
+            if (Color[j] == aux_struct[i].color) {
+                acum += Grado(j, G);
+                if (aux_struct[i].len_vertices < index_vertex) {
+                    aux_struct[i].len_vertices = (aux_struct[i].vertices, sizeof(u32) * (aux_struct[i].len_vertices) * 2);
+                }
+                aux_struct[i].vertices[index_vertex] = j;
+                index_vertex++;
+            }
+        }
+        acum = acum * i;
+        aux_struct[i].fun_grado = acum;
+        aux_struct[i].len_vertices = index_vertex;
+        acum = 0;
+        index_vertex = 0;
+    }
+    qsort(aux_struct, r, sizeof(set_vertices), cmp_fun_grado);
+
+    index_vertex = 0;  // para reordenar Orden
+    int i = 0;         // iterador de r ergo colores
+    while ((index_vertex < n) && (i < r)) {
+
+        // j es el que recorre adentro de cada arreicito de vertices de mismo color
+        for (u32 j = 0; j < aux_struct[i].len_vertices; j++) {
+            Orden[index_vertex] = aux_struct[i].vertices[j];
+            index_vertex++;
+        }
+        i++;
+    }
+
+    free(aux_struct);
+
+    return '0';
+    // Ver cuando retorna '1'
+}
 
 char OrdenNaturalReverse(u32 n, u32 *Orden, u32 *Color) {
     u32 last_charged = Color[n - 1];  //== 0
