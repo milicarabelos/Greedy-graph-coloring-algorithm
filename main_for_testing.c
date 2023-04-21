@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -8,7 +9,7 @@
 int main() {
     FILE* fp;
     // cambiar el primer parametro para probar otros casos, probar my_grafo_papi.txt no deberia andar
-    fp = fopen("Grafos/pQ5Q5.txt", "r");
+    fp = fopen("Grafos/pdsc.txt", "r");
     if (fp == NULL) {
         printf("Error: could not open file.\n");
         return 1;
@@ -20,26 +21,42 @@ int main() {
     u32* Orden = calloc(n, sizeof(u32));
     u32* Color = calloc(n, sizeof(u32));
 
-    // Orden = my_graph->list_vertices->indice;
-
-    printf("antes de greedy\n");
-
     for (u32 i = 0; i < n; i++) {
-        Orden[i] = Nombre(i, my_graph);
+        Orden[i] = my_graph->list_vertices[i].indice;
 
-        // printf("Orden[%d] = %d\n", i, Orden[i]);
+        assert(Orden[i] < n);
     }
 
-    /*     for (u32 i = 0; i < NumeroDeLados(my_graph); i++)
-        {
-            printf("Lado %d: %d - %d\n", i, my_graph->list_lados[i].x, my_graph->list_lados[i].y);
-        } */
+    u32 color_greedy = Greedy(my_graph, Orden, Color);
+    u32 minimo_coloreo = color_greedy;
+    printf("coloreo inicial con %d colores\n", color_greedy);
 
-    u32 colores = Greedy(my_graph, Orden, Color);
+    for (u32 i = 0; i < 500; i++) {
+        char result = OrdenImparPar(n, Orden, Color);
 
-    printf("coloreo con %d colores\n", colores);
+        if (result == 1) {
+            printf("error en OrdenImparPar\n");
+            break;
+        } else {
+            color_greedy = Greedy(my_graph, Orden, Color);
+
+            if (minimo_coloreo > color_greedy) {
+                minimo_coloreo = color_greedy;
+            }
+
+            // printf("coloreo numero %d con %d colores\n", i + 1, color_greedy);
+        }
+    }
+
+    printf("minimo coloreo: %d\n", minimo_coloreo);
+
+    free(Orden);
+    free(Color);
+    Orden = NULL;
+    Color = NULL;
 
     DestruirGrafo(my_graph);
     fclose(fp);
+
     return 0;
 }

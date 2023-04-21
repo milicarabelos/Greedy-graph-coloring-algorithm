@@ -1,5 +1,6 @@
 #include "APIparte2.h"
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -9,7 +10,7 @@ int cmp_ascendente(const void *a, const void *b) {
     return (*(int *)a - *(int *)b);
 }
 
-int cmp_descendente(const void *a, const void *b) {
+int cmp_desc(const void *a, const void *b) {
     int num1 = *((int *)a);
     int num2 = *((int *)b);
     return num2 - num1;
@@ -52,7 +53,7 @@ static u32 primer_color_disponible(u32 i, Grafo G, u32 *Orden, u32 *Color) {
         }
 
         // si el color es igual al minimo que quiero usar aumento mi minimo pues no puedo usar
-        //  ese color
+        // ese color ya que lo tiene un vecino de mi vertice
         if (min_col == vecinos_colores[i]) {
             ultimo_color_chequeado = vecinos_colores[i];
             min_col++;
@@ -63,7 +64,10 @@ static u32 primer_color_disponible(u32 i, Grafo G, u32 *Orden, u32 *Color) {
         }
     }
 
-    return n + 2;
+    free(vecinos_colores);
+    vecinos_colores = NULL;
+
+    return min_col;
 }
 
 // funcion encargada de asignar el minimo color posible a un vertice i y actualizar el maximo color usado
@@ -100,48 +104,113 @@ u32 Greedy(Grafo G, u32 *Orden, u32 *Color) {
     return max_color_used + 1;
 }
 
+struct data_colores {
+    u32 cantidad;
+    u32 *indices;
+};
+
+// encuentra el maximo valor de un array
+u32 find_max(u32 arr[], u32 n) {
+    unsigned int max_val = 0;
+
+    for (u32 i = 0; i < n; i++) {
+        if (arr[i] > max_val) {
+            max_val = arr[i];
+        }
+    }
+    return max_val;
+}
+
 char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
-    u32 *pares = calloc(n, sizeof(u32));
-    if (pares == NULL) {
-        return (char)1;
+    u32 cantcol = find_max(Color, n) + 1;
+
+    // pido memoria para el array por colores
+    struct data_colores *colores = calloc(cantcol, sizeof(struct data_colores));
+    if (colores == NULL) {
+        return 1;
     }
+    // pido memoria para cada array interno
+    for (u32 i = 0; i < cantcol; i++) {
+        colores[i].indices = calloc(n, sizeof(u32));
+        // si hay error al pedir memoria
+        if (colores[i].indices == NULL) {
+            for (u32 j = 0; j < i; j++) {
+                free(colores[j].indices);
+                colores[j].indices = NULL;
+            }
 
-    qsort(Color, n, sizeof(u32), cmp_ascendente);
+            free(colores);
+            colores = NULL;
 
-    u32 last_charged = Color[0];  //== 0
-    u32 ind_impar = 0;
-    u32 ind_par = 0;
-
-    for (u32 ind_col = 0; ind_col < n; ind_col++) {
-        if (Color[ind_col] % 2 == 0 && (Color[ind_col] != last_charged || ind_col == 0)) {
-            pares[ind_par] = Color[ind_col];
-            last_charged = Color[ind_col];
-            ind_par++;
+            return 1;
         }
-        // siempre mi color empieza en 0 asi que no necesito chequear i==0
-        else if (Color[ind_col] % 2 != 0 && Color[ind_col] != last_charged) {
-            Orden[ind_impar] = Color[ind_col];
-            last_charged = Color[ind_col];
-            ind_impar++;
+        colores[i].cantidad = 0;
+    }
+
+    // pedi toda la memora ahora recorro
+
+    for (u32 i = 0; i < n; i++) {
+        u32 color_a_cargar = Color[i];
+        u32 index = colores[color_a_cargar].cantidad;
+
+        colores[color_a_cargar].indices[index] = i;
+        colores[color_a_cargar].cantidad++;
+    }
+
+    // ahora recorro los colores y cargo Orden
+    // cargar colores impares
+    u32 iterar_color = 1;
+
+    // mientras el color sea valido en mi coloreo
+    u32 i = 0;
+    while (iterar_color < cantcol && i < n) {
+        u32 counter = 0;
+        // cargo todos los vertices del color iterar_color
+        while (counter < colores[iterar_color].cantidad) {
+            Orden[i] = colores[iterar_color].indices[counter];
+            counter++;
+            i++;
         }
+        // itero el siguiente color impar
+        iterar_color += 2;
     }
 
-    for (u32 ind = 0; ind < ind_par; ind++) {
-        Orden[ind_impar] = pares[ind];
-        ind_impar++;
+    // cargar colores pares
+    iterar_color = 0;
+
+    // mientras el color sea valido en mi coloreo
+    while (iterar_color < cantcol) {
+        u32 counter = 0;
+        // cargo todos los vertices del color iterar_color
+        while (counter < colores[iterar_color].cantidad) {
+            Orden[i] = colores[iterar_color].indices[counter];
+            counter++;
+            i++;
+        }
+        // itero el siguiente color impar
+        iterar_color += 2;
     }
 
-    free(pares);
-    pares = NULL;
-    return (char)0;
+    assert(i == n);
+
+    // libero la memoria pedida
+    for (u32 i = 0; i < cantcol; i++) {
+        free(colores[i].indices);
+        colores[i].indices = NULL;
+    }
+
+    free(colores);
+    colores = NULL;
+
+    return 0;
 }
 
 /* char OrdenJedi(Grafo G, u32 *Orden, u32 *Color) {
 
 } */
 
-char OrdenNaturalReverse(u32 n, u32* Orden, u32* Color){
-    u32 last_charged = Color[n - 1]; //== 0
+char OrdenNaturalReverse(u32 n, u32 *Orden, u32 *Color) {
+    u32 last_charged = Color[n - 1];  //== 0
 
     qsort(Color, n, sizeof(u32), cmp_ascendente);
 
@@ -151,10 +220,12 @@ char OrdenNaturalReverse(u32 n, u32* Orden, u32* Color){
         }
         Orden[ind_col] = last_charged;
     }
+
+    return 0;
 }
 
-char OrdenNatural(u32 n, u32* Orden, u32* Color){
-    u32 last_charged = Color[0]; //== 0
+char OrdenNatural(u32 n, u32 *Orden, u32 *Color) {
+    u32 last_charged = Color[0];  //== 0
 
     qsort(Color, n, sizeof(u32), cmp_ascendente);
 
@@ -164,12 +235,12 @@ char OrdenNatural(u32 n, u32* Orden, u32* Color){
         }
         Orden[ind_col] = last_charged;
     }
+    return 0;
 }
 
-
-char OrdenAleatorio(u32 n, u32* Orden, u32* Color){
+char OrdenAleatorio(u32 n, u32 *Orden, u32 *Color) {
     unsigned int random_id = 0;
-    u32 last_charged = Color[random_id]; //== 0
+    u32 last_charged = Color[random_id];  //== 0
     qsort(Color, n, sizeof(u32), cmp_ascendente);
 
     for (u32 ind_col = 0; ind_col < n; ind_col++) {
@@ -179,4 +250,5 @@ char OrdenAleatorio(u32 n, u32* Orden, u32* Color){
         }
         Orden[ind_col] = last_charged;
     }
+    return 0;
 }
