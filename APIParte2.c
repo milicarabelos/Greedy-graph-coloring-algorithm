@@ -36,6 +36,10 @@ int cmp_desc(const void *a, const void *b) {
     return num2 - num1;
 }
 
+int cmp_descendente_grades(unsigned int a, unsigned int b) {
+    return (b - a);
+}
+
 // esta funcion devuelve el primer color disponible para un vertice de acuerdo a los colores de sus vecinos
 static u32 primer_color_disponible(u32 i, Grafo G, u32 *Orden, u32 *Color) {
     u32 n = NumeroDeVertices(G);
@@ -115,9 +119,49 @@ u32 Greedy(Grafo G, u32 *Orden, u32 *Color) {
     // asignar el primer color al primer vertice
     Color[Orden[0]] = 0;
 
-    // asignar el minimo color posible a los demas vertices
-    for (u32 i = 1; i < n; i++) {
-        max_color_used = asignar_color(i, G, Orden, Color, max_color_used);
+    for (u32 i = 0; i < n; i++) {
+
+        u32 min_col = 0;
+        u32 vertice = Orden[i];
+        u32 grado_vertice = Grado(vertice, G);
+        u32 *vecinos_colores = calloc(grado_vertice, sizeof(u32));
+
+        //printf("greedy iteracion 1 i=%d\n", i);
+
+        for (unsigned j = 0; j < grado_vertice; j++) {
+            vecinos_colores[j] = Color[IndiceVecino(j, vertice, G)];
+            //printf("greedy iteracion 2 j =%d\n", j);
+        }
+
+        // Ordeno los colores de los vecinos
+        qsort(vecinos_colores, grado_vertice, sizeof(u32), cmp_ascendente);
+
+        if (vecinos_colores[0] == n + 2) {
+            Color[vertice] = 0;
+        } 
+        else {
+            u32 color_repetido = n+2;
+            for (u32 j = 0; j < grado_vertice; j++) {
+                // empiezo a recorrer desde el color minimo de los vecinos si no es el min_col
+                // resulta que el color es mayor que el min_col, entonces puedo usarlo y hago break
+                if (min_col == vecinos_colores[j] && vecinos_colores[j] != color_repetido) {
+                    //QUE PASA SI LOS COLORES SE REPITEN??
+                    min_col++;
+                    if (min_col > ultimo_col) {
+                        ultimo_col = min_col;
+                        cant_col++;
+                    }
+                } else {
+                    break;
+                }
+                printf("colores iteracion %d\n", j);
+            }
+
+            Color[vertice] = min_col;
+        }
+
+        free(vecinos_colores);
+        vecinos_colores = NULL;
     }
 
     // el maximo color usado + 1 es la cantidad de colores usados
@@ -282,20 +326,6 @@ char OrdenJedi(Grafo G, u32 *Orden, u32 *Color) {
     // Ver cuando retorna '1'
 }
 
-char OrdenNaturalReverse(u32 n, u32 *Orden, u32 *Color) {
-    u32 last_charged = Color[n - 1];  //== 0
-
-    qsort(Color, n, sizeof(u32), cmp_ascendente);
-
-    for (u32 ind_col = 0; ind_col < n; ind_col++) {
-        if ((Color[ind_col] != last_charged)) {
-            last_charged = Color[n - ind_col - 1];
-        }
-        Orden[ind_col] = last_charged;
-    }
-
-    return 0;
-}
 
 char OrdenNatural(u32 n, u32 *Orden, u32 *Color) {
     u32 last_charged = Color[0];  //== 0
@@ -307,6 +337,12 @@ char OrdenNatural(u32 n, u32 *Orden, u32 *Color) {
             last_charged = Color[ind_col];
         }
         Orden[ind_col] = last_charged;
+
+// Ver de hacer static por tema del .h, o ver dodne poner las funciones
+void OrdenNaturalReverse(u32 n, u32* Orden, Grafo my_graph){
+    for(u32 i=0; i < my_graph->cant_vertices; i++){
+        Orden[i] = my_graph->list_vertices[n - 1 - i].nombre;
+        printf("Orden[%d] = %d\n", i, Orden[i]);
     }
     return 0;
 }
