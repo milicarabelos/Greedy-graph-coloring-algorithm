@@ -18,16 +18,15 @@ Aca no es necesaria la estructura de G, solo n.*/
 char OrdenImparPar(u32 n, u32* Orden, u32* Color);
 
 // ordena indices en la forma especial dada en las especificaciones
-// char OrdenJedi(Grafo G, u32* Orden, u32* Color);
+char OrdenJedi(Grafo G, u32* Orden, u32* Color);
 
-
-/*ordena los indices de manera natural*/
+/*ordena los indices de menor a mayor*/
 void OrdenNatural(u32 n, u32* Orden);
 
-/*ordena los indices de manera antural a la inversa*/
+/*ordena los indices de manera inversa*/
 void OrdenNaturalReverse(u32 n, u32* Orden);
 
-/*ordena los indices de manera aleatoria*/
+/*ordena los indices de manera inversa*/
 void OrdenAleatorio(u32 n, u32* Orden);
 
 void OrdenWelshPowell(u32 n, u32* Orden, Grafo my_graph);

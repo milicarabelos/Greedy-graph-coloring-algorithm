@@ -9,7 +9,7 @@
 int main() {
     FILE* fp;
     // cambiar el primer parametro para probar otros casos, probar my_grafo_papi.txt no deberia andar
-    fp = fopen("q13.txt", "r");
+    fp = fopen("Grafos/pqsc.txt", "r");
     if (fp == NULL) {
         printf("Error: could not open file.\n");
         return 1;
@@ -23,9 +23,9 @@ int main() {
 
     printf("antes de greedy\n");
     // OrdenAleatorio(n, Orden);
-    // OrdenWelshPowell(n, Orden, my_graph);
+    OrdenWelshPowell(n, Orden, my_graph);
     // OrdenNaturalReverse(n, Orden);
-    OrdenNatural(n, Orden);
+    // OrdenNatural(n, Orden);
     u32 color_greedy = Greedy(my_graph, Orden, Color);
     u32 minimo_coloreo = color_greedy;
     printf("coloreo inicial con %d colores\n", color_greedy);
@@ -47,7 +47,26 @@ int main() {
         }
     }
 
-    printf("minimo coloreo: %d\n", minimo_coloreo);
+    printf("minimo coloreo ImparPar: %d\n", minimo_coloreo);
+
+    for (u32 i = 0; i < 1; i++) {
+        char result = OrdenJedi(my_graph, Orden, Color);
+
+        if (result == 1) {
+            printf("error en OrdenImparPar\n");
+            break;
+        } else {
+            color_greedy = Greedy(my_graph, Orden, Color);
+
+            if (minimo_coloreo > color_greedy) {
+                minimo_coloreo = color_greedy;
+            }
+
+            // printf("coloreo numero %d con %d colores\n", i + 1, color_greedy);
+        }
+    }
+
+    printf("minimo coloreo Jedi: %d\n", minimo_coloreo);
 
     free(Orden);
     free(Color);

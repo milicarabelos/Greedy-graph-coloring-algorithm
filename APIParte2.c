@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct set_vetices {
     u32 *vertices;
@@ -267,7 +268,6 @@ char OrdenJedi(Grafo G, u32 *Orden, u32 *Color) {
     index_vertex = 0;  // para reordenar Orden
     int i = 0;         // iterador de r ergo colores
     while ((index_vertex < n) && (i < r)) {
-
         // j es el que recorre adentro de cada arreicito de vertices de mismo color
         for (u32 j = 0; j < aux_struct[i].len_vertices; j++) {
             Orden[index_vertex] = aux_struct[i].vertices[j];
@@ -289,37 +289,36 @@ void OrdenNatural(u32 n, u32 *Orden) {
 }
 
 // Ver de hacer static por tema del .h, o ver dodne poner las funciones
-void OrdenNaturalReverse(u32 n, u32* Orden){
-    for(u32 i=0; i <  n; i++){
-        Orden[i] = n-1-i;
+void OrdenNaturalReverse(u32 n, u32 *Orden) {
+    for (u32 i = 0; i < n; i++) {
+        Orden[i] = n - 1 - i;
     }
 }
 
 void OrdenAleatorio(u32 n, u32 *Orden) {
     unsigned int random_id = 0;
-    bool used[n]; // Guardamos los numeros ya usados
-    memset(used, false, n * sizeof(bool)); // inicializamos en 0
+    bool used[n];                           // Guardamos los numeros ya usados
+    memset(used, false, n * sizeof(bool));  // inicializamos en 0
 
     for (u32 ind_col = 0; ind_col < n; ind_col++) {
-        while (used[random_id]){ // Si el numero ya fue usado, busco otro
+        while (used[random_id]) {  // Si el numero ya fue usado, busco otro
             random_id = rand() % n;
-        } 
-        
+        }
+
         Orden[ind_col] = random_id;
-        used[random_id] = true; // Marco el numero como usado
+        used[random_id] = true;  // Marco el numero como usado
     }
 }
-
-
 
 struct data_grades {
     u32 indice;
     u32 grade;
 };
 
+// grados de mayor a menor
 int compare_grades(const void *a, const void *b) {
-    const struct data_grades *data_a = (const struct data_grades *) a;
-    const struct data_grades *data_b = (const struct data_grades *) b;
+    const struct data_grades *data_a = (const struct data_grades *)a;
+    const struct data_grades *data_b = (const struct data_grades *)b;
 
     if (data_a->grade < data_b->grade) {
         return 1;
@@ -330,21 +329,19 @@ int compare_grades(const void *a, const void *b) {
     }
 }
 
-void OrdenWelshPowell(u32 n, u32* Orden, Grafo my_graph) {
+void OrdenWelshPowell(u32 n, u32 *Orden, Grafo my_graph) {
     // Step 1: Sort vertices by degree in descending order
     // Hacer struct que guarde indices etc
     struct data_grades grados[n];
-    for(u32 i=0; i < NumeroDeVertices(my_graph); i++){
+    for (u32 i = 0; i < n; i++) {
         grados[i].indice = i;
         grados[i].grade = Grado(i, my_graph);
     }
 
-
     qsort(grados, n, sizeof(struct data_grades), compare_grades);
-
 
     for (u32 i = 0; i < n; i++) {
         Orden[i] = grados[i].indice;
-        printf("Orden[%d] = %d\n", i, Orden[i]);
+        // printf("Orden[%d] = %d\n", i, Orden[i]);
     }
 }
