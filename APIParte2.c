@@ -131,7 +131,7 @@ struct data_colores {
 };
 
 // encuentra el maximo valor de un array
-u32 find_max(u32 arr[], u32 n) {
+u32 max_elem_array(u32 arr[], u32 n) {
     unsigned int max_val = 0;
 
     for (u32 i = 0; i < n; i++) {
@@ -143,7 +143,7 @@ u32 find_max(u32 arr[], u32 n) {
 }
 
 char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
-    u32 cantcol = find_max(Color, n) + 1;
+    u32 cantcol = max_elem_array(Color, n) + 1;
 
     // pido memoria para el array por colores
     struct data_colores *colores = calloc(cantcol, sizeof(struct data_colores));
@@ -226,60 +226,83 @@ char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
     return 0;
 }
 
-char OrdenJedi(Grafo G, u32 *Orden, u32 *Color) {
-    u32 n = NumeroDeVertices(G);
-    set_vertices *aux_struct;
-    u32 acum = 0;
-    u32 r = 0;
-    u32 index_vertex = 0;
-
-    for (u32 i = 0; i < n; i++) {
-        if (Color[i] > r) {
-            r = Color[i];
-        }
-    }
-    r++;
-
-    aux_struct = calloc(r, sizeof(set_vertices));
+static char cargar_vertices_mismo_color(Grafo G, set_vertices *aux_struct, u32 *Color, u32 n, u32 r) {
+    u32 acum, indice_vertices;
 
     for (u32 i = 0; i < r; i++) {
+        // me voy fijando en cada color y agrego espacio para los vertices, la cantidad inicial de vertices con ese color es 0
+        indice_vertices = 0;
+        acum = 0;
         aux_struct[i].color = i;
-        aux_struct[i].vertices = calloc(Delta(G), sizeof(u32));
+        aux_struct[i].vertices = calloc(n, sizeof(u32));
+
+        if (aux_struct[i].vertices == NULL) {
+            for (u32 k = 0; k < i; k++) {
+                free(aux_struct[k].vertices);
+                aux_struct[k].vertices = NULL;
+            }
+            free(aux_struct);
+            aux_struct = NULL;
+            return '1';
+        }
+
         aux_struct[i].len_vertices = 0;
         // sumatoria de grado de los vertices de color i
+        // Comparo el color de todos los vertices con el color i
         for (u32 j = 0; j < n; j++) {
-            if (Color[j] == aux_struct[i].color) {
+            if (Color[j] == i) {
+                // voy sumando el grado de los vertices de mismo color
                 acum += Grado(j, G);
-                if (aux_struct[i].len_vertices < index_vertex) {
-                    aux_struct[i].len_vertices = (aux_struct[i].vertices, sizeof(u32) * (aux_struct[i].len_vertices) * 2);
-                }
-                aux_struct[i].vertices[index_vertex] = j;
-                index_vertex++;
+                aux_struct[i].vertices[indice_vertices] = j;
+                indice_vertices++;
             }
         }
         acum = acum * i;
         aux_struct[i].fun_grado = acum;
-        aux_struct[i].len_vertices = index_vertex;
-        acum = 0;
-        index_vertex = 0;
+        aux_struct[i].len_vertices = indice_vertices;
     }
-    qsort(aux_struct, r, sizeof(set_vertices), cmp_fun_grado);
-
-    index_vertex = 0;  // para reordenar Orden
-    int i = 0;         // iterador de r ergo colores
-    while ((index_vertex < n) && (i < r)) {
-        // j es el que recorre adentro de cada arreicito de vertices de mismo color
-        for (u32 j = 0; j < aux_struct[i].len_vertices; j++) {
-            Orden[index_vertex] = aux_struct[i].vertices[j];
-            index_vertex++;
-        }
-        i++;
-    }
-
-    free(aux_struct);
-
     return '0';
-    // Ver cuando retorna '1'
+}
+
+static void destroy_same_color(set_vertices *aux_struct, u32 r) {
+    for (u32 i = 0; i < r; i++) {
+        free(aux_struct[i].vertices);
+        aux_struct[i].vertices = NULL;
+    }
+    free(aux_struct);
+    aux_struct = NULL;
+}
+
+char OrdenJedi(Grafo G, u32 *Orden, u32 *Color) {
+    u32 n = NumeroDeVertices(G);
+    set_vertices *vertice_mismo_color;
+    u32 acum = 0;
+    u32 r = 0;
+    u32 incide_vertices = 0;
+    char error;
+
+    r = max_elem_array(Color, n) + 1;
+
+    vertice_mismo_color = calloc(r, sizeof(set_vertices));
+    if (vertice_mismo_color == NULL) {
+        return '1';
+    }
+    // itero en el struct de tamaño colores
+    error = cargar_vertices_mismo_color(G, vertice_mismo_color, Color, n, r);
+    if (error == '1') {
+        return '1';
+    }
+    qsort(vertice_mismo_color, r, sizeof(set_vertices), cmp_fun_grado);
+    // iterador de r ergo colores
+    for (u32 i = 0; /* (incide_vertices < vertice_mismo_color[i].len_vertices) && */ (i < r); i++) {
+        // j es el que recorre adentro de cada arreicito de vertices de mismo color
+        for (u32 j = 0; j < vertice_mismo_color[i].len_vertices; j++) {
+            Orden[incide_vertices] = vertice_mismo_color[i].vertices[j];
+            incide_vertices++;
+        }
+    }
+    destroy_same_color(vertice_mismo_color, r);
+    return '0';
 }
 
 void OrdenNatural(u32 n, u32 *Orden) {
