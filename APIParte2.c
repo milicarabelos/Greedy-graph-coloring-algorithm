@@ -227,7 +227,8 @@ char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
 }
 
 char OrdenJedi(Grafo G, u32 *Orden, u32 *Color) {
-    u32 n = NumeroDeVertices(G);
+    printf("Orden Jedi\n Grafo %d n=", &G, NumeroDeVertices(G));
+    // u32 n = NumeroDeVertices(G);
     set_vertices *aux_struct;
     u32 acum = 0;
     u32 r = 0;
