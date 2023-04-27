@@ -228,7 +228,6 @@ char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
 
 static char cargar_vertices_mismo_color(Grafo G, set_vertices *aux_struct, u32 *Color, u32 n, u32 r) {
     u32 acum, indice_vertices;
-
     for (u32 i = 0; i < r; i++) {
         // me voy fijando en cada color y agrego espacio para los vertices, la cantidad inicial de vertices con ese color es 0
         indice_vertices = 0;
