@@ -15,71 +15,71 @@
 y la cantidad de lados
 */
 /* static print_graph(Grafo G) {
-    printf("Vertices: %u\n", G->cant_vertices);
-    printf("Lados: %u\n", G->cant_lados);
+    printf("Vertices: %u\n", G->cantVertices);
+    printf("Lados: %u\n", G->cantLados);
     printf("Mayor grado: %u\n", G->mayor_grado);
-         for (u32 i = 0; i < G->cant_vertices; i++) {
-            printf("Vertice %u: ", G->list_vertices[i].nombre);
-            printf("Grado %u: ", G->list_vertices[i].grado);
-            for (u32 j = 0; j < G->list_vertices[i].grado; j++) {
-                printf("%u ", G->list_vertices[i].indice_vecinos[j]);
+         for (u32 i = 0; i < G->cantVertices; i++) {
+            printf("Vertice %u: ", G->listVertices[i].nombre);
+            printf("Grado %u: ", G->listVertices[i].grado);
+            for (u32 j = 0; j < G->listVertices[i].grado; j++) {
+                printf("%u ", G->listVertices[i].indiceVecinos[j]);
             }
             printf("\n");
         }
 } */
 
-static Grafo init_grafo(u32 n, u32 m) {
-    Grafo new_grafo = calloc(1, sizeof(GrafoSt));
+static Grafo initGrafo(u32 n, u32 m) {
+    Grafo newGrafo = calloc(1, sizeof(GrafoSt));
 
-    if (new_grafo == NULL) {
+    if (newGrafo == NULL) {
         printf("Error no se pudo pedir la memoria para la estructura grafo");
         return NULL;
     }
 
     // guardaste memoria para M*2 tuplas
-    new_grafo->list_lados = (Tupla *)calloc((2 * m), sizeof(Tupla));
-    if (new_grafo->list_lados == NULL) {
+    newGrafo->listLados = (Tupla *)calloc((2 * m), sizeof(Tupla));
+    if (newGrafo->listLados == NULL) {
         printf("Error no se pudo pedir la memoria para la lista de lados");
-        free(new_grafo);
+        free(newGrafo);
         return NULL;
     }
     // guaradste memoria para una lista con N vertices
     // estos vertices fijate van a vivr en esos espacios de memoria
-    new_grafo->list_vertices = calloc(n, sizeof(vertice));
-    if (new_grafo->list_vertices == NULL) {
+    newGrafo->listVertices = calloc(n, sizeof(vertice));
+    if (newGrafo->listVertices == NULL) {
         printf("Error no se pudo pedir la memoria para la lista de vertices");
-        free(new_grafo->list_lados);
-        free(new_grafo);
+        free(newGrafo->listLados);
+        free(newGrafo);
         return NULL;
     }
-    new_grafo->cant_vertices = n;
-    new_grafo->cant_lados = m;
-    new_grafo->mayor_grado = 0;
+    newGrafo->cantVertices = n;
+    newGrafo->cantLados = m;
+    newGrafo->mayorGrado = 0;
 
-    return new_grafo;
+    return newGrafo;
 }
 
-static void cargar_lado(Tupla *lista_lados, int i, u32 primero, u32 segundo) {
-    lista_lados[i].x = primero;
-    lista_lados[i].y = segundo;
-    lista_lados[i + 1].x = segundo;
-    lista_lados[i + 1].y = primero;
+static void cargar_lado(Tupla *listaLados, int i, u32 primero, u32 segundo) {
+    listaLados[i].x = primero;
+    listaLados[i].y = segundo;
+    listaLados[i + 1].x = segundo;
+    listaLados[i + 1].y = primero;
 }
 
-static int cmp_tuples(const void *a, const void *b) {
+static int cmpTuples(const void *a, const void *b) {
     // ordena de menor a mayor primero respecto de
     // la primera componente (x) y luego de la segunda (y)
 
-    Tupla *tupla_a = (Tupla *)a;
-    Tupla *tupla_b = (Tupla *)b;
-    if (tupla_a->x < tupla_b->x) {
+    Tupla *tuplaA = (Tupla *)a;
+    Tupla *tuplaB = (Tupla *)b;
+    if (tuplaA->x < tuplaB->x) {
         return -1;
-    } else if (tupla_a->x > tupla_b->x) {
+    } else if (tuplaA->x > tuplaB->x) {
         return 1;
     } else {
-        if (tupla_a->y < tupla_b->y) {
+        if (tuplaA->y < tuplaB->y) {
             return -1;
-        } else if (tupla_a->y > tupla_b->y) {
+        } else if (tuplaA->y > tuplaB->y) {
             return 1;
         } else {
             return 0;
@@ -87,14 +87,14 @@ static int cmp_tuples(const void *a, const void *b) {
     }
 }
 
-static int binary_search(Grafo G, u32 target_name) {
+static int binarySearch(Grafo G, u32 target_name) {
     u32 left = 0;
-    u32 right = G->cant_vertices - 1;
+    u32 right = G->cantVertices - 1;
     u32 pivot;
     u32 vecino;
     while (left <= right) {
         pivot = (left + right) / 2;
-        vecino = G->list_vertices[pivot].nombre;
+        vecino = G->listVertices[pivot].nombre;
 
         if (vecino == target_name) {
             return pivot;
@@ -107,86 +107,86 @@ static int binary_search(Grafo G, u32 target_name) {
     return -1;
 }
 
-static void cargar_vecinos(Grafo G) {
+static void cargarVecinos(Grafo G) {
     u32 indice;
-    u32 max_grade = 0;
+    u32 maxGrade = 0;
     // printf("Cargando vecinos.\n");
-    for (u32 i = 0; i < G->cant_vertices; i++) {
-        if (G->list_vertices[i].grado > max_grade) {
-            max_grade = G->list_vertices[i].grado;
+    for (u32 i = 0; i < G->cantVertices; i++) {
+        if (G->listVertices[i].grado > maxGrade) {
+            maxGrade = G->listVertices[i].grado;
         }
-        for (u32 j = 0; j < G->list_vertices[i].grado; j++) {
-            // printf("Cargando vecino %u del vertice %u\n", j, G->list_vertices[i].nombre);
-            indice = binary_search(G, G->list_vertices[i].indice_vecinos[j]);
+        for (u32 j = 0; j < G->listVertices[i].grado; j++) {
+            // printf("Cargando vecino %u del vertice %u\n", j, G->listVertices[i].nombre);
+            indice = binarySearch(G, G->listVertices[i].indiceVecinos[j]);
             if (indice != -1) {
-                // printf("Nombre del vertice: %u ", G->list_vertices[i].nombre);
-                // printf("Nombre del vecino antes: %u", G->list_vertices[i].indice_vecinos[j]);
-                ////    printf(" GRADO %u", G->list_vertices[i].grado);
-                // printf("\nNombre del vecino buscado con indice obtenido: %u\n\n", G->list_vertices[indice].nombre);
+                // printf("Nombre del vertice: %u ", G->listVertices[i].nombre);
+                // printf("Nombre del vecino antes: %u", G->listVertices[i].indiceVecinos[j]);
+                ////    printf(" GRADO %u", G->listVertices[i].grado);
+                // printf("\nNombre del vecino buscado con indice obtenido: %u\n\n", G->listVertices[indice].nombre);
 
-                G->list_vertices[i].indice_vecinos[j] = indice;
+                G->listVertices[i].indiceVecinos[j] = indice;
             }
         }
     }
-    G->mayor_grado = max_grade;
+    G->mayorGrado = maxGrade;
     // printf("Vecinos Cargados :).\n");
 }
 
-static void cargar_vertices(Grafo G) {
-    u32 last_charged = NULL;
+static void cargarVertices(Grafo G) {
+    u32 lastCharged = 0;
     u32 grado = 0;
-    u32 indice_vert = 0;
-    u32 **general_vecinos = calloc(G->cant_vertices, sizeof(u32 *));
+    u32 indiceVert = 0;
+    u32 **generalVecinos = calloc(G->cantVertices, sizeof(u32 *));
 
     // cargo el primer vertice y su indice
-    G->list_vertices[indice_vert].nombre = G->list_lados[indice_vert].x;
-    last_charged = G->list_vertices[indice_vert].nombre;
-    G->list_vertices[indice_vert].indice = indice_vert;
+    G->listVertices[indiceVert].nombre = G->listLados[indiceVert].x;
+    lastCharged = G->listVertices[indiceVert].nombre;
+    G->listVertices[indiceVert].indice = indiceVert;
 
-    for (u32 i = 0; i < G->cant_lados * 2; i++) {
-        if (G->list_lados[i].x == last_charged) {
+    for (u32 i = 0; i < G->cantLados * 2; i++) {
+        if (G->listLados[i].x == lastCharged) {
             grado++;
-            G->list_vertices[indice_vert].grado = grado;
+            G->listVertices[indiceVert].grado = grado;
         } else {
-            indice_vert++;
+            indiceVert++;
             grado = 1;
-            last_charged = G->list_lados[i].x;
-            G->list_vertices[indice_vert].nombre = last_charged;
-            G->list_vertices[indice_vert].indice = indice_vert;
-            G->list_vertices[indice_vert].grado = grado;
+            lastCharged = G->listLados[i].x;
+            G->listVertices[indiceVert].nombre = lastCharged;
+            G->listVertices[indiceVert].indice = indiceVert;
+            G->listVertices[indiceVert].grado = grado;
         }
 
-        general_vecinos[indice_vert] = realloc(general_vecinos[indice_vert], grado * sizeof(u32));
-        // printf("%u \n", general_vecinos[indice_vert]);
-        general_vecinos[indice_vert][grado - 1] = G->list_lados[i].y;
+        generalVecinos[indiceVert] = realloc(generalVecinos[indiceVert], grado * sizeof(u32));
+        // printf("%u \n", generalVecinos[indiceVert]);
+        generalVecinos[indiceVert][grado - 1] = G->listLados[i].y;
     }
 
     // update the vertex arrays with the neighbor lists
-    for (u32 i = 0; i < G->cant_vertices; i++) {
-        G->list_vertices[i].indice_vecinos = calloc(G->list_vertices[i].grado, sizeof(u32));
-        // printf("list_vecinos de %u\n", G->list_vertices[i].nombre);
+    for (u32 i = 0; i < G->cantVertices; i++) {
+        G->listVertices[i].indiceVecinos = calloc(G->listVertices[i].grado, sizeof(u32));
+        // printf("list_vecinos de %u\n", G->listVertices[i].nombre);
 
         // printf("[");
-        for (u32 j = 0; j < G->list_vertices[i].grado; j++) {
-            G->list_vertices[i].indice_vecinos[j] = general_vecinos[i][j];
-            // printf("%u,", G->list_vertices[i].indice_vecinos[j]);
+        for (u32 j = 0; j < G->listVertices[i].grado; j++) {
+            G->listVertices[i].indiceVecinos[j] = generalVecinos[i][j];
+            // printf("%u,", G->listVertices[i].indiceVecinos[j]);
         }
         // printf("] \n");
-        free(general_vecinos[i]);
+        free(generalVecinos[i]);
     }
-    free(general_vecinos);
+    free(generalVecinos);
 }
 
-static Grafo destroy_grafo(Grafo grafo) {
-    for (u32 i = 0; i < grafo->cant_vertices; i++) {
-        free(grafo->list_vertices[i].indice_vecinos);
-        grafo->list_vertices[i].indice_vecinos = NULL;
+static Grafo destroyGrafo(Grafo grafo) {
+    for (u32 i = 0; i < grafo->cantVertices; i++) {
+        free(grafo->listVertices[i].indiceVecinos);
+        grafo->listVertices[i].indiceVecinos = NULL;
     }
 
-    free(grafo->list_vertices);
-    grafo->list_vertices = NULL;
-    free(grafo->list_lados);
-    grafo->list_lados = NULL;
+    free(grafo->listVertices);
+    grafo->listVertices = NULL;
+    free(grafo->listLados);
+    grafo->listLados = NULL;
 
     free(grafo);
     return NULL;
@@ -196,20 +196,20 @@ static Grafo destroy_grafo(Grafo grafo) {
 /*debe leer desde stdin
 Debo calcular el Delta
 */
-Grafo ConstruirGrafo(FILE *f_input) {
-    // FILE *f_input = stdin;
+Grafo ConstruirGrafo() {
+    FILE *fInput = stdin;
     char line[1024];
     u32 n, m, x, y;
-    Grafo my_grafo;
+    Grafo myGraph;
 
-    while (fgets(line, sizeof(line), f_input)) {
+    while (fgets(line, sizeof(line), fInput)) {
         if (line[0] == 'c') {
             // hago skip a esta linea y continuo a la siguiente
             continue;
         } else if (line[0] == 'p') {
             sscanf(line, "p edge %u %u", &n, &m);
             // printf("n = %u, m = %u\n", n, m);
-            my_grafo = init_grafo(n, m);
+            myGraph = initGrafo(n, m);
 
             break;
         } else {
@@ -223,64 +223,64 @@ Grafo ConstruirGrafo(FILE *f_input) {
    por lo que no tengo que seguir leyendo
     */
     for (u32 i = 0; i < m * 2; i = i + 2) {
-        fgets(line, sizeof(line), f_input);
+        fgets(line, sizeof(line), fInput);
         if (line[0] != 'e') {
             // ERROR en formato
             return NULL;
         } else {
             // aca entiendo deberiamos cargar desp ordenar y desp cargar los vertices pero pa eso deberiamos recorrer los vertices y eso esta raro
             sscanf(line, "e %u %u", &x, &y);
-            cargar_lado(my_grafo->list_lados, i, x, y);
+            cargar_lado(myGraph->listLados, i, x, y);
         }
     }
 
     // ordeno los lados de menor a mayor por primera y segunda componente
     // ERROR: aca funciona para R22_93_15 pero tira malloc corrupted para el resto SE CLAVA ACAAAA
     // printf("antes del sort");
-    qsort(my_grafo->list_lados, my_grafo->cant_lados * 2, sizeof(Tupla), cmp_tuples);
+    qsort(myGraph->listLados, myGraph->cantLados * 2, sizeof(Tupla), cmpTuples);
 
     // carga de vertices
-    cargar_vertices(my_grafo);
+    cargarVertices(myGraph);
 
     // carga de vecinos
-    cargar_vecinos(my_grafo);
+    cargarVecinos(myGraph);
 
-    // print_graph(my_grafo);
+    // print_graph(myGraph);
 
-    return my_grafo;
+    return myGraph;
 }
 
 void DestruirGrafo(Grafo G) {
-    G = destroy_grafo(G);
+    G = destroyGrafo(G);
 }
 
 // funciones para extraer datos del grafo. u32 debe estar definida en el .h de arriba
 
 u32 NumeroDeVertices(Grafo G) {
-    return G->cant_vertices;
+    return G->cantVertices;
 }
 u32 NumeroDeLados(Grafo G) {
-    return G->cant_lados;
+    return G->cantLados;
 }
 u32 Delta(Grafo G) {
-    return G->mayor_grado;
+    return G->mayorGrado;
 }
 // funciones de extraccion de informacion de vertices
 
 u32 Nombre(u32 i, Grafo G) {
-    return G->list_vertices[i].nombre;
+    return G->listVertices[i].nombre;
 }
 u32 Grado(u32 i, Grafo G) {
-    return G->list_vertices[i].grado;
+    return G->listVertices[i].grado;
 }
 
 // vertice i y  buscar el j-esimo vecino de i
 
 u32 IndiceVecino(u32 j, u32 i, Grafo G) {
-    if (i >= G->cant_vertices || j >= G->list_vertices[i].grado) {
+    if (i >= G->cantVertices || j >= G->listVertices[i].grado) {
         return (2 ^ 32) - 1;
         // caso de error
     }
 
-    return G->list_vertices[i].indice_vecinos[j];
+    return G->listVertices[i].indiceVecinos[j];
 }

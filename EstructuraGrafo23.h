@@ -16,16 +16,16 @@ typedef struct
 typedef struct {
     unsigned int nombre;
     unsigned int grado;
-    unsigned int *indice_vecinos;
+    unsigned int *indiceVecinos;
     unsigned int indice;
 } vertice;
 
 typedef struct {
-    vertice *list_vertices;  // ordenar por indice
-    Tupla *list_lados;       // ordenar para cargar vertices
-    unsigned int cant_vertices;
-    unsigned int cant_lados;
-    unsigned int mayor_grado;  // Δ
+    vertice *listVertices;  // ordenar por indice
+    Tupla *listLados;       // ordenar para cargar vertices
+    unsigned int cantVertices;
+    unsigned int cantLados;
+    unsigned int mayorGrado;  // Δ
 } GrafoSt;
 
 /*
