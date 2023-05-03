@@ -252,19 +252,17 @@ static char cargarVerticesMismoColor(Grafo G, setVertices *auxStruct, u32 *Color
         }
 
         auxStruct[i].lenVertices = 0;
-        // sumatoria de grado de los vertices de color i
-        // Comparo el color de todos los vertices con el color i
-        for (u32 j = 0; j < n; j++) {
-            if (Color[j] == i) {
-                // voy sumando el grado de los vertices de mismo color
-                acum += Grado(j, G);
-                auxStruct[i].vertices[indiceVertices] = j;
-                indiceVertices++;
-            }
-        }
-        acum = acum * i;
-        auxStruct[i].funGrados = acum;
-        auxStruct[i].lenVertices = indiceVertices;
+        auxStruct[i].funGrados = 0;
+    }
+
+    // sumatoria de grado de los vertices de color i
+    // Comparo el color de todos los vertices con el color i
+    for (u32 j = 0; j < n; j++) {
+        // voy sumando el grado de los vertices de mismo color
+        u32 index = auxStruct[Color[j]].lenVertices;
+        auxStruct[Color[j]].vertices[index] = j;
+        auxStruct[Color[j]].lenVertices++;
+        auxStruct[Color[j]].funGrados += Grado(j, G) * Color[j];
     }
     return 0;
 }

@@ -5,7 +5,7 @@
 
 #include "APIG23.h"
 #include "APIParte2.h"
-#include "EstructuraGrafo23.h"
+// #include "EstructuraGrafo23.h"
 
 ///////////////////////funciones de orden iniciales///////////////////////////
 void OrdenNatural(u32 n, u32 *Orden) {
