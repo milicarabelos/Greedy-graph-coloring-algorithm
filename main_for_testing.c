@@ -14,7 +14,6 @@ void OrdenNatural(u32 n, u32 *Orden) {
     }
 }
 
-// Ver de hacer static por tema del .h, o ver dodne poner las funciones
 void OrdenNaturalReverse(u32 n, u32 *Orden) {
     for (u32 i = 0; i < n; i++) {
         Orden[i] = n - 1 - i;
@@ -23,16 +22,16 @@ void OrdenNaturalReverse(u32 n, u32 *Orden) {
 
 void OrdenAleatorio(u32 n, u32 *Orden) {
     unsigned int randomID = 0;
-    bool used[n];                           // Guardamos los numeros ya usados
-    memset(used, false, n * sizeof(bool));  // inicializamos en 0
+    bool used[n];                           
+    memset(used, false, n * sizeof(bool));
 
     for (u32 indCol = 0; indCol < n; indCol++) {
-        while (used[randomID]) {  // Si el numero ya fue usado, busco otro
+        while (used[randomID]) {
             randomID = rand() % n;
         }
 
         Orden[indCol] = randomID;
-        used[randomID] = true;  // Marco el numero como usado
+        used[randomID] = true;
     }
 }
 
@@ -56,8 +55,6 @@ int compareGrades(const void *a, const void *b) {
 }
 
 void OrdenWelshPowell(u32 n, u32 *Orden, Grafo myGraph) {
-    // Step 1: Sort vertices by degree in descending order
-    // Hacer struct que guarde indices etc
     struct dataGrades grados[n];
     for (u32 i = 0; i < n; i++) {
         grados[i].indice = i;
@@ -68,10 +65,10 @@ void OrdenWelshPowell(u32 n, u32 *Orden, Grafo myGraph) {
 
     for (u32 i = 0; i < n; i++) {
         Orden[i] = grados[i].indice;
-        // printf("Orden[%d] = %d\n", i, Orden[i]);
     }
 }
 //////////////////////////////////////////////////////////////////////////////////////
+
 
 void swapArrays(u32 **arr1, u32 **arr2) {
     u32 *temp = *arr1;
@@ -81,16 +78,12 @@ void swapArrays(u32 **arr1, u32 **arr2) {
 
 int main() {
     Grafo myGraph = ConstruirGrafo();
-    // Aca tengo que llamar a Construir Grafo mandandole el fp
-
     u32 n = NumeroDeVertices(myGraph);
     u32 *Orden = calloc(n, sizeof(u32));
     u32 *Color = calloc(n, sizeof(u32));
     u32 *Color_2 = calloc(n, sizeof(u32));
     u32 elegir = 0;
     u32 minNumCrom = n + 2;
-
-    printf("antes de greedy\n");
 
     OrdenNatural(n, Orden);
     u32 numCrom1 = Greedy(myGraph, Orden, Color);
@@ -145,7 +138,7 @@ int main() {
             break;
     }
 
-    printf("coloreo inicial con %d colores\n", minNumCrom);
+    printf("coloreo orden inicial inicial con %d colores\n", minNumCrom);
     u32 colorGreedy, colorGreedy2;
 
     for (u32 i = 0; i < 500; i++) {
@@ -177,46 +170,6 @@ int main() {
     }
 
     printf("minimo coloreo despues de Jedy y ImparPar: %d\n", minNumCrom);
-
-    //////////////////////////////////////////////////////////////////////////////////////
-    /*     u32 colorGreedy = 0;
-
-        for (u32 i = 0; i < 1; i++) {
-            char result = OrdenImparPar(n, Orden, Color);
-
-            if (result == 1) {
-                printf("error en OrdenImparPar\n");
-                break;
-            } else {
-                colorGreedy = Greedy(myGraph, Orden, Color);
-
-                if (minNumCrom > colorGreedy) {
-                    minNumCrom = colorGreedy;
-                }
-            }
-        }
-
-        printf("minimo coloreo ImparPar: %d\n", minNumCrom);
-
-        for (u32 i = 0; i < 1; i++) {
-            char result = OrdenJedi(myGraph, Orden, Color);
-
-            if (result == 1) {
-                printf("error en OrdenImparPar\n");
-                break;
-            } else {
-                colorGreedy = Greedy(myGraph, Orden, Color);
-
-                if (minNumCrom > colorGreedy) {
-                    minNumCrom = colorGreedy;
-                }
-
-                // printf("coloreo numero %d con %d colores\n", i + 1, colorGreedy);
-            }
-        }
-
-        printf("minimo coloreo Jedi: %d\n", minNumCrom);*/
-    ////////////////////////////////////////////////////////
 
     free(Orden);
     free(Color);

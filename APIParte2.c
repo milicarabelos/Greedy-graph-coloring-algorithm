@@ -72,7 +72,8 @@ static u32 primerColorDisponible(u32 i, Grafo G, u32 *Orden, u32 *Color) {
         if (minCol == vecinosColores[i]) {
             ultimoColorChequeado = vecinosColores[i];
             minCol++;
-        } else {  // si no es igual quiere decir que minCol es menor por el orden ascendente uso este minCol
+        } else {
+            // si no es igual quiere decir que minCol es menor por el orden ascendente uso este minCol
             free(vecinosColores);
             vecinosColores = NULL;
             return minCol;
@@ -85,9 +86,9 @@ static u32 primerColorDisponible(u32 i, Grafo G, u32 *Orden, u32 *Color) {
     return minCol;
 }
 
-// funcion encargada de asignar el minimo color posible a un vertice i y actualizar el maximo color usado
-//  ya que maxColorUsed + 1 es la cant de colores que use para greedy en total
 static u32 asignarColor(u32 i, Grafo G, u32 *Orden, u32 *Color, u32 maxColorUsed) {
+    // asigna el minimo color posible a un vertice i y actualiza el maximo color usado
+    //  ya que maxColorUsed + 1 es la cant de colores que use para greedy en total
     u32 color = primerColorDisponible(i, G, Orden, Color);
 
     if (maxColorUsed < color) {
@@ -124,8 +125,8 @@ struct data_colores {
     u32 *indices;
 };
 
-// encuentra el maximo valor de un array
 u32 maxElemArray(u32 arr[], u32 n) {
+    // encuentra el maximo valor de un array
     unsigned int max_val = 0;
 
     for (u32 i = 0; i < n; i++) {
@@ -138,16 +139,13 @@ u32 maxElemArray(u32 arr[], u32 n) {
 
 char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
     u32 cantCol = maxElemArray(Color, n) + 1;
-
-    // pido memoria para el array por colores
     struct data_colores *colores = calloc(cantCol, sizeof(struct data_colores));
     if (colores == NULL) {
         return 1;
     }
-    // pido memoria para cada array interno
+
     for (u32 i = 0; i < cantCol; i++) {
         colores[i].indices = calloc(n, sizeof(u32));
-        // si hay error al pedir memoria
         if (colores[i].indices == NULL) {
             for (u32 j = 0; j < i; j++) {
                 free(colores[j].indices);
@@ -161,9 +159,6 @@ char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
         }
         colores[i].cantidad = 0;
     }
-
-    // pedi toda la memora ahora recorro
-
     for (u32 i = 0; i < n; i++) {
         u32 colorACargar = Color[i];
         u32 index = colores[colorACargar].cantidad;
@@ -174,7 +169,6 @@ char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
 
     // ahora recorro los colores y cargo Orden
     // cargar colores impares
-
     u32 mayorImpar;
     u32 mayorPar;
 
@@ -187,40 +181,34 @@ char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
     }
 
     u32 iterarColor = mayorImpar;
-
-    // mientras el color sea valido en mi coloreo
     u32 i = 0;
     while (iterarColor < cantCol && iterarColor > 0 && i < n) {
+        // mientras el color sea valido en mi coloreo
         u32 counter = 0;
-        // cargo todos los vertices del color iterarColor
         while (counter < colores[iterarColor].cantidad) {
+            // cargo todos los vertices del color iterarColor
             Orden[i] = colores[iterarColor].indices[counter];
             counter++;
             i++;
         }
-        // itero el siguiente color impar
         iterarColor -= 2;
     }
 
-    // cargar colores pares
     iterarColor = mayorPar;
-
-    // mientras el color sea valido en mi coloreo
     while (iterarColor < cantCol && iterarColor >= 0 && i <= n) {
+        // mientras el color sea valido en mi coloreo
         u32 counter = 0;
-        // cargo todos los vertices del color iterarColor
         while (counter < colores[iterarColor].cantidad) {
+            // cargo todos los vertices del color iterarColor
             Orden[i] = colores[iterarColor].indices[counter];
             counter++;
             i++;
         }
-        // itero el siguiente color impar
         iterarColor -= 2;
     }
 
     assert(i == n);
 
-    // libero la memoria pedida
     for (u32 i = 0; i < cantCol; i++) {
         free(colores[i].indices);
         colores[i].indices = NULL;
@@ -235,7 +223,8 @@ char OrdenImparPar(u32 n, u32 *Orden, u32 *Color) {
 static char cargarVerticesMismoColor(Grafo G, setVertices *auxStruct, u32 *Color, u32 n, u32 r) {
     u32 acum, indiceVertices;
     for (u32 i = 0; i < r; i++) {
-        // me voy fijando en cada color y agrego espacio para los vertices, la cantidad inicial de vertices con ese color es 0
+        // me voy fijando en cada color y agrego espacio para los vertices,
+        // la cantidad inicial de vertices con ese color es 0
         indiceVertices = 0;
         acum = 0;
         auxStruct[i].color = i;
@@ -255,7 +244,6 @@ static char cargarVerticesMismoColor(Grafo G, setVertices *auxStruct, u32 *Color
         auxStruct[i].funGrados = 0;
     }
 
-    // sumatoria de grado de los vertices de color i
     // Comparo el color de todos los vertices con el color i
     for (u32 j = 0; j < n; j++) {
         // voy sumando el grado de los vertices de mismo color
@@ -296,8 +284,7 @@ char OrdenJedi(Grafo G, u32 *Orden, u32 *Color) {
     }
     qsort(verticeMismoColor, r, sizeof(setVertices), cmpFunGrados);
     // iterador de r ergo colores
-    for (u32 i = 0; /* (indiceVertices < verticeMismoColor[i].lenVertices) && */ (i < r); i++) {
-        // j es el que recorre adentro de cada arreicito de vertices de mismo color
+    for (u32 i = 0; (i < r); i++) {
         for (u32 j = 0; j < verticeMismoColor[i].lenVertices; j++) {
             Orden[indiceVertices] = verticeMismoColor[i].vertices[j];
             indiceVertices++;
